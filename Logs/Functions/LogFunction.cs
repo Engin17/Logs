@@ -108,7 +108,7 @@ namespace Logs.Functions
 
                     ZipFile.CreateFromDirectory(logPath, logTempZip, CompressionLevel.Fastest, true);
 
-                    MessageBox.Show(logName + " successfully zipped", "Success");
+                    MessageBox.Show(logName + " successfully zipped", "Succeeded");
 
                     if (logName == MainViewModel.ServerLogsName)
                     {
