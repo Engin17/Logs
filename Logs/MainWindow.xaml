@@ -1,0 +1,39 @@
+﻿<Window x:Class="Logs.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Logs.ViewModels"
+        xmlns:func="clr-namespace:Logs.Functions"
+        xmlns:local="clr-namespace:Logs"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525" Background="Gray">
+
+    <Window.Resources>
+        <func:LogFunction x:Key="logFunc"/>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="150" />
+            <RowDefinition Height="150" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="250" />
+        </Grid.ColumnDefinitions>
+
+        <Button Name="btnServer" Content="Server Logs" Height="50" Width="100" Grid.Row="0" Grid.Column="0" Command="{Binding ExportServerLogsCommand}"/>
+        <Button Name="btnClient" Content="Client Logs" Height="50" Width="100" Grid.Row="0" Grid.Column="1" Command="{Binding ExportClientLogsConfCommand}"/>
+        <Button Name="btnServerFTP" Height="50" Width="100" Grid.Row="1" Grid.Column="0" IsEnabled="{Binding BtnServerEnabled}"  Command="{Binding UploadServerFilesFTPCommand}">
+            <TextBlock>Server Logs <LineBreak /> FTP-Server</TextBlock>
+        </Button>
+        <Button Name="btnClientFTP" Height="50" Width="100" Grid.Row="1" Grid.Column="1" IsEnabled="{Binding BtnClientEnabled}" Command="{Binding UploadClientFilesFTPCommand}">
+            <TextBlock>Client Logs <LineBreak /> FTP-Server</TextBlock>
+        </Button>
+    </Grid>
+</Window>
