@@ -13,6 +13,7 @@ namespace Logs.Functions
     {
         private static bool _clientLogsConfZipCreated;
         private static bool _serverLogsZipCreated;
+        private static string _logText = "Welcome \n";
 
         /// <summary>
         /// Property to check if client logs and conf zip folder is created
@@ -30,6 +31,17 @@ namespace Logs.Functions
         {
             get { return _serverLogsZipCreated; }
             set { _serverLogsZipCreated = value; }
+        }
+
+        public static string LogText
+        {
+            get { return _logText; }
+            set
+            {
+                if (_logText == value) return;
+                _logText = value;
+                RaiseStaticPropertyChanged("LogText");
+            }
         }
 
 
@@ -107,7 +119,7 @@ namespace Logs.Functions
                 {
 
                     ZipFile.CreateFromDirectory(logPath, logTempZip, CompressionLevel.Fastest, true);
-
+                    LogText += "\n " + DateTime.Now;
                     MessageBox.Show(logName + " successfully zipped", "Succeeded");
 
                     if (logName == MainViewModel.ServerLogsName)
@@ -192,6 +204,17 @@ namespace Logs.Functions
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Evet to update static properties
+        /// </summary>
+        public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
+        public static void RaiseStaticPropertyChanged(string propName)
+        {
+            EventHandler<PropertyChangedEventArgs> handler = StaticPropertyChanged;
+            if (handler != null)
+                handler(null, new PropertyChangedEventArgs(propName));
         }
     }
 

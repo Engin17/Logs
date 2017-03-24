@@ -35,32 +35,32 @@ namespace Logs.ViewModels
         private static readonly string clientLogsConfTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf";
         private static readonly string _clientLogsConfName = "client logs and configuration";
 
-        private bool _btnClientEnabled = false;
-        private bool _btnServerEnabled = false;
+        private bool _btnClientFTPEnabled = false;
+        private bool _btnServerFTPEnabled = false;
         #endregion
 
         #region property members
-        public bool BtnClientEnabled
+        public bool BtnClientFTPEnabled
         {
-            get { return _btnClientEnabled; }
+            get { return _btnClientFTPEnabled; }
             set
             {
-                if (_btnClientEnabled != value)
+                if (_btnClientFTPEnabled != value)
                 {
-                    _btnClientEnabled = value;
+                    _btnClientFTPEnabled = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        public bool BtnServerEnabled
+        public bool BtnServerFTPEnabled
         {
-            get { return _btnServerEnabled; }
+            get { return _btnServerFTPEnabled; }
             set
             {
-                if (_btnServerEnabled != value)
+                if (_btnServerFTPEnabled != value)
                 {
-                    _btnServerEnabled = value;
+                    _btnServerFTPEnabled = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -127,9 +127,10 @@ namespace Logs.ViewModels
             LogFunction.CopyLogs(clientConfPath, clientConfCopyTemp, true);
             LogFunction.CreateLogs(clientLogsConfTemp, clientLogsConfTempZip, _clientLogsConfName, clientLogsConfTemp);
 
-            if (LogFunction.ClientLogsConfZipCreated == true) 
+            // Enable client ftp upload button after client logs and conf are zipped
+            if (LogFunction.ClientLogsConfZipCreated == true)
             {
-                BtnClientEnabled = true;
+                BtnClientFTPEnabled = true;
             }
         }
 
@@ -143,9 +144,10 @@ namespace Logs.ViewModels
             LogFunction.CopyLogs(serverLogsPath, serverLogsCopyTemp, true);
             LogFunction.CreateLogs(serverLogsCopyTemp, serverLogsTempZip, _serverLogsName, serverLogsCopyTemp);
 
+            // Enable server ftp upload button after server logs are zipped
             if (LogFunction.ServerLogsConfZipCreated == true)
             {
-                BtnServerEnabled = true;
+                BtnServerFTPEnabled = true;
             }
         }
 
@@ -168,7 +170,7 @@ namespace Logs.ViewModels
         // This method is called by the Set accessor of each property.
         // The CallerMemberName attribute that is applied to the optional propertyName
         // parameter causes the property name of the caller to be substituted as an argument.
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
             if (PropertyChanged != null)
             {
