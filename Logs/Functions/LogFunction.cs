@@ -11,39 +11,6 @@ namespace Logs.Functions
 {
     public class LogFunction
     {
-        private static bool _clientLogsConfZipCreated;
-        private static bool _serverLogsZipCreated;
-        private static string _logText = "Welcome \n";
-
-        /// <summary>
-        /// Property to check if client logs and conf zip folder is created
-        /// </summary>
-        public static bool ClientLogsConfZipCreated
-        {
-            get { return _clientLogsConfZipCreated; }
-            set { _clientLogsConfZipCreated = value; }
-        }
-
-        /// <summary>
-        /// Property to check if server logs zip folder is created
-        /// </summary>
-        public static bool ServerLogsConfZipCreated
-        {
-            get { return _serverLogsZipCreated; }
-            set { _serverLogsZipCreated = value; }
-        }
-
-        public static string LogText
-        {
-            get { return _logText; }
-            set
-            {
-                if (_logText == value) return;
-                _logText = value;
-                RaiseStaticPropertyChanged("LogText");
-            }
-        }
-
 
         /// <summary>
         /// Method for copy the server logs, because we can not zip the server logs when the services are running
@@ -51,7 +18,7 @@ namespace Logs.Functions
         /// <param name="logPath"></param>
         /// <param name="logCopyTemp"></param>
         /// <param name="copySubDirs"></param>
-        public static void CopyLogs(string logPath, string logCopyTemp, bool copySubDirs)
+        public static void CopyLogs(string logPath, string logCopyTemp, bool copySubDirs, string logName)
         {
             try
             {
@@ -80,8 +47,17 @@ namespace Logs.Functions
                         foreach (DirectoryInfo subdir in dirs)
                         {
                             string temppath = Path.Combine(logCopyTemp, subdir.Name);
-                            CopyLogs(subdir.FullName, temppath, copySubDirs);
+                            CopyLogs(subdir.FullName, temppath, copySubDirs, logName);
                         }
+                    }
+
+                    if (logName == MainViewModel.ClientConfName)
+                    {
+                        MainViewModel.ClientConfCopied = true;
+                    }
+                    if (logName == MainViewModel.ClientLogsName)
+                    {
+                        MainViewModel.ClientLogsCopied = true;
                     }
                 }
 
@@ -89,14 +65,15 @@ namespace Logs.Functions
                 {
                     // delete old copied logs and copy new logs inside the temp folder
                     Directory.Delete(logCopyTemp, true);
-                    CopyLogs(logPath, logCopyTemp, true);
+                    CopyLogs(logPath, logCopyTemp, true, logName);
                 }
 
 
             }
             catch (DirectoryNotFoundException ex)
             {
-                MessageBox.Show("Directory not found: " + ex.Message, "Fail");
+                MainViewModel.LogText += "\n [" + DateTime.Now + "] ERROR: " + ex.Message;
+
             }
 
         }
@@ -108,7 +85,6 @@ namespace Logs.Functions
         /// <param name="logTempZip"></param>
         public static void CreateLogs(string logPath, string logTempZip, string logName, string logTemp)
         {
-            LogFunction test = new LogFunction();
             // check if logs already exported
             FileInfo sFile = new FileInfo(logTempZip);
             bool fileExist = sFile.Exists;
@@ -117,18 +93,16 @@ namespace Logs.Functions
             {
                 if (!fileExist)
                 {
-
                     ZipFile.CreateFromDirectory(logPath, logTempZip, CompressionLevel.Fastest, true);
-                    LogText += "\n " + DateTime.Now;
-                    MessageBox.Show(logName + " successfully zipped", "Succeeded");
+                    MainViewModel.LogText += "\n " + DateTime.Now + ": " + logName + " successfully zipped";
 
                     if (logName == MainViewModel.ServerLogsName)
                     {
-                        ServerLogsConfZipCreated = true;
+                        MainViewModel.BtnServerFTPEnabled = true;
                     }
-                    else if (logName == MainViewModel.ClientLogsConfName)
+                    if (logName == MainViewModel.ClientLogsConfName)
                     {
-                        ClientLogsConfZipCreated = true;
+                        MainViewModel.BtnClientFTPEnabled = true;
                     }
                 }
                 else
@@ -143,7 +117,8 @@ namespace Logs.Functions
             }
             catch (DirectoryNotFoundException ex)
             {
-                MessageBox.Show("Directory not found: " + ex.Message, "Fail");
+                MainViewModel.LogText += "\n [" + DateTime.Now + "] ERROR: " + ex.Message;
+                MainViewModel.LogText += "\n [" + DateTime.Now + "] ERROR: Could not create " + MainViewModel.ClientLogsConfName.ToLower() + " zip folder";
             }
         }
 
@@ -206,16 +181,6 @@ namespace Logs.Functions
             }
         }
 
-        /// <summary>
-        /// Evet to update static properties
-        /// </summary>
-        public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
-        public static void RaiseStaticPropertyChanged(string propName)
-        {
-            EventHandler<PropertyChangedEventArgs> handler = StaticPropertyChanged;
-            if (handler != null)
-                handler(null, new PropertyChangedEventArgs(propName));
-        }
     }
 
 }

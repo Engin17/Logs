@@ -17,15 +17,15 @@ namespace Logs.ViewModels
     /// <summary>
     /// This is our MainViewModel that is tied to the MainWindow
     /// </summary>
-    public class MainViewModel : INotifyPropertyChanged
+    public class MainViewModel
     {
         #region Member variables
         private static string path = new Uri(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
         private static string path2 = Directory.GetCurrentDirectory();
-        private static readonly string serverLogsPath = @"C:\Program Files\SeeTec\log";
+        private static readonly string serverLogsPath = @"C:\Program Files\SeeTec\log2";
         private static readonly string serverLogsTempZip = @"C:\Program Files\SeeTec\TempLogs\ServerLog.zip";
         private static readonly string serverLogsCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ServerLog";
-        private static readonly string _serverLogsName = "server logs";
+        private static readonly string _serverLogsName = "Server logs";
 
         private static readonly string clientLogsPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\log");
         private static readonly string clientConfPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\conf");
@@ -33,36 +33,56 @@ namespace Logs.ViewModels
         private static readonly string clientLogCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf\ClientLogs";
         private static readonly string clientConfCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf\ClientConf";
         private static readonly string clientLogsConfTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf";
-        private static readonly string _clientLogsConfName = "client logs and configuration";
+        private static readonly string _clientLogsConfName = "Client logs and configuration";
+        private static readonly string _clientLogsName = "Client logs";
+        private static readonly string _clientConfName = "Client conf";
 
-        private bool _btnClientFTPEnabled = false;
-        private bool _btnServerFTPEnabled = false;
+        private static bool _isBtnClientFTPEnabled = false;
+        private static bool _isBtnServerFTPEnabled = false;
+
+        private static bool _isClientLogsCopied = false;
+        private static bool _isClientConfCopied = false;
+
+        private static string _logText = "Welcome!!! \n";
         #endregion
 
-        #region property members
-        public bool BtnClientFTPEnabled
+        #region Property members
+        public static bool BtnClientFTPEnabled
         {
-            get { return _btnClientFTPEnabled; }
+            get { return _isBtnClientFTPEnabled; }
             set
             {
-                if (_btnClientFTPEnabled != value)
-                {
-                    _btnClientFTPEnabled = value;
-                    NotifyPropertyChanged();
-                }
+
+                _isBtnClientFTPEnabled = value;
+                RaiseStaticPropertyChanged();
             }
         }
 
-        public bool BtnServerFTPEnabled
+        public static bool BtnServerFTPEnabled
         {
-            get { return _btnServerFTPEnabled; }
+            get { return _isBtnServerFTPEnabled; }
             set
             {
-                if (_btnServerFTPEnabled != value)
-                {
-                    _btnServerFTPEnabled = value;
-                    NotifyPropertyChanged();
-                }
+                _isBtnServerFTPEnabled = value;
+                RaiseStaticPropertyChanged();
+            }
+        }
+
+        public static bool ClientLogsCopied
+        {
+            get { return _isClientLogsCopied; }
+            set
+            {
+                _isClientLogsCopied = value;
+            }
+        }
+
+        public static bool ClientConfCopied
+        {
+            get { return _isClientConfCopied; }
+            set
+            {
+                _isClientConfCopied = value;
             }
         }
 
@@ -75,9 +95,27 @@ namespace Logs.ViewModels
         {
             get { return _clientLogsConfName; }
         }
-        #endregion
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public static string ClientLogsName
+        {
+            get { return _clientLogsName; }
+        }
+
+        public static string ClientConfName
+        {
+            get { return _clientConfName; }
+        }
+
+        public static string LogText
+        {
+            get { return _logText; }
+            set
+            {
+                _logText = value;
+                RaiseStaticPropertyChanged();
+            }
+        }
+        #endregion
 
         #region ICommand properties
         /// <summary>
@@ -123,15 +161,22 @@ namespace Logs.ViewModels
         /// </summary>
         private void ExecuteExportClientLogsConfCommand()
         {
-            LogFunction.CopyLogs(clientLogsPath, clientLogCopyTemp, true);
-            LogFunction.CopyLogs(clientConfPath, clientConfCopyTemp, true);
-            LogFunction.CreateLogs(clientLogsConfTemp, clientLogsConfTempZip, _clientLogsConfName, clientLogsConfTemp);
-
-            // Enable client ftp upload button after client logs and conf are zipped
-            if (LogFunction.ClientLogsConfZipCreated == true)
+            LogFunction.CopyLogs(clientLogsPath, clientLogCopyTemp, true, ClientLogsName);
+            if (ClientConfCopied && ClientLogsCopied == true)
             {
-                BtnClientFTPEnabled = true;
+                LogText += "\n [" + DateTime.Now + "] INFO: " + clientLogsConfTemp;
             }
+            else if (ClientLogsCopied)
+            {
+                LogText += "\n [" + DateTime.Now + "] INFO: " + ClientLogsName;
+            }
+            else if (ClientConfCopied)
+            {
+                LogText += "\n [" + DateTime.Now + "] INFO: " + ClientConfName;
+            }
+            
+            LogFunction.CopyLogs(clientConfPath, clientConfCopyTemp, true, ClientConfName);
+            LogFunction.CreateLogs(clientLogsConfTemp, clientLogsConfTempZip, _clientLogsConfName, clientLogsConfTemp);
         }
 
         /// <summary>
@@ -141,14 +186,8 @@ namespace Logs.ViewModels
         /// </summary>
         private void ExecuteExportServerLogsCommand()
         {
-            LogFunction.CopyLogs(serverLogsPath, serverLogsCopyTemp, true);
+            LogFunction.CopyLogs(serverLogsPath, serverLogsCopyTemp, true, ServerLogsName);
             LogFunction.CreateLogs(serverLogsCopyTemp, serverLogsTempZip, _serverLogsName, serverLogsCopyTemp);
-
-            // Enable server ftp upload button after server logs are zipped
-            if (LogFunction.ServerLogsConfZipCreated == true)
-            {
-                BtnServerFTPEnabled = true;
-            }
         }
 
         /// <summary>
@@ -167,15 +206,15 @@ namespace Logs.ViewModels
             LogFunction.UploadLogsFTP(serverLogsTempZip);
         }
 
-        // This method is called by the Set accessor of each property.
+        // This method is called by the Set accessor of each static properties.
         // The CallerMemberName attribute that is applied to the optional propertyName
         // parameter causes the property name of the caller to be substituted as an argument.
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
+        public static void RaiseStaticPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            EventHandler<PropertyChangedEventArgs> handler = StaticPropertyChanged;
+            if (handler != null)
+                handler(null, new PropertyChangedEventArgs(propertyName));
         }
 
     }

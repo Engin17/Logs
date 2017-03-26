@@ -7,10 +7,11 @@
         xmlns:func="clr-namespace:Logs.Functions"
         xmlns:local="clr-namespace:Logs"
         mc:Ignorable="d"
-        Title="MainWindow" Height="330" Width="700" Background="Gray">
+        Title="MainWindow" Height="330" Width="700" Background="Gray" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
 
     <Window.Resources>
         <func:LogFunction x:Key="logFunc"/>
+        <vm:MainViewModel x:Key="main" />
     </Window.Resources>
 
     <Window.DataContext>
@@ -23,22 +24,22 @@
             <RowDefinition Height="150" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="130" />
+            <ColumnDefinition Width="130" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Button Name="btnServer" Content="Server Logs" Height="50" Width="100" Grid.Row="0" Grid.Column="0" Command="{Binding ExportServerLogsCommand}"/>
-        <Button Name="btnClient" Content="Client Logs" Height="50" Width="100" Grid.Row="0" Grid.Column="1" Command="{Binding ExportClientLogsConfCommand}"/>
-        <Button Name="btnServerFTP" Height="50" Width="100" Grid.Row="1" Grid.Column="0" IsEnabled="{Binding BtnServerFTPEnabled}"  Command="{Binding UploadServerFilesFTPCommand}">
+        <Button Name="btnServer" Content="Server Logs" Height="50" Width="80" Grid.Row="0" Grid.Column="0" Command="{Binding ExportServerLogsCommand}"/>
+        <Button Name="btnClient" Content="Client Logs" Height="50" Width="80" Grid.Row="0" Grid.Column="1" Command="{Binding ExportClientLogsConfCommand}"/>
+        <Button Name="btnServerFTP" Height="50" Width="80" Grid.Row="1" Grid.Column="0" IsEnabled="{Binding BtnServerFTPEnabled}"  Command="{Binding UploadServerFilesFTPCommand}">
             <TextBlock>Server Logs <LineBreak /> FTP-Server</TextBlock>
         </Button>
-        <Button Name="btnClientFTP" Height="50" Width="100" Grid.Row="1" Grid.Column="1" IsEnabled="{Binding BtnClientFTPEnabled}" Command="{Binding UploadClientFilesFTPCommand}">
+        <Button Name="btnClientFTP" Height="50" Width="80" Grid.Row="1" Grid.Column="1" IsEnabled="{Binding BtnClientFTPEnabled}" Command="{Binding UploadClientFilesFTPCommand}">
             <TextBlock>Client Logs <LineBreak /> FTP-Server</TextBlock>
         </Button>
 
         <Border BorderBrush="Gray" BorderThickness="2" Grid.Column="2" Grid.RowSpan="2">
-            <TextBlock Name="tblockLog"  Background="White" Text="{Binding LogText, Source={StaticResource logFunc}}" />
+            <TextBox Name="tbLog"  Background="White" Text="{Binding LogText, Source={StaticResource main}}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
         </Border>
 
     </Grid>
