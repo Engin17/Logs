@@ -34,14 +34,9 @@ namespace Logs.ViewModels
         private static readonly string clientConfCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf\ClientConf";
         private static readonly string clientLogsConfTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf";
         private static readonly string _clientLogsConfName = "Client logs and configuration";
-        private static readonly string _clientLogsName = "Client logs";
-        private static readonly string _clientConfName = "Client conf";
 
         private static bool _isBtnClientFTPEnabled = false;
         private static bool _isBtnServerFTPEnabled = false;
-
-        private static bool _isClientLogsCopied = false;
-        private static bool _isClientConfCopied = false;
 
         private static string _logText = "Welcome!!! \n";
         #endregion
@@ -68,24 +63,6 @@ namespace Logs.ViewModels
             }
         }
 
-        public static bool ClientLogsCopied
-        {
-            get { return _isClientLogsCopied; }
-            set
-            {
-                _isClientLogsCopied = value;
-            }
-        }
-
-        public static bool ClientConfCopied
-        {
-            get { return _isClientConfCopied; }
-            set
-            {
-                _isClientConfCopied = value;
-            }
-        }
-
         public static string ServerLogsName
         {
             get { return _serverLogsName; }
@@ -94,16 +71,6 @@ namespace Logs.ViewModels
         public static string ClientLogsConfName
         {
             get { return _clientLogsConfName; }
-        }
-
-        public static string ClientLogsName
-        {
-            get { return _clientLogsName; }
-        }
-
-        public static string ClientConfName
-        {
-            get { return _clientConfName; }
         }
 
         public static string LogText
@@ -161,22 +128,16 @@ namespace Logs.ViewModels
         /// </summary>
         private void ExecuteExportClientLogsConfCommand()
         {
-            LogFunction.CopyLogs(clientLogsPath, clientLogCopyTemp, true, ClientLogsName);
-            if (ClientConfCopied && ClientLogsCopied == true)
-            {
-                LogText += "\n [" + DateTime.Now + "] INFO: " + clientLogsConfTemp;
-            }
-            else if (ClientLogsCopied)
-            {
-                LogText += "\n [" + DateTime.Now + "] INFO: " + ClientLogsName;
-            }
-            else if (ClientConfCopied)
-            {
-                LogText += "\n [" + DateTime.Now + "] INFO: " + ClientConfName;
-            }
-            
-            LogFunction.CopyLogs(clientConfPath, clientConfCopyTemp, true, ClientConfName);
+            LogFunction.CopyLogs(clientLogsPath, clientLogCopyTemp, true);
+            LogFunction.CopyLogs(clientConfPath, clientConfCopyTemp, true);
+            // HIER MAL SCHAUEN WIESO ZWEIMAL CLIENTLOGSCONFTEMP PARAMETER
             LogFunction.CreateLogs(clientLogsConfTemp, clientLogsConfTempZip, _clientLogsConfName, clientLogsConfTemp);
+
+            if (File.Exists(clientLogsConfTempZip))
+            {
+                LogText += "\n [" + DateTime.Now + "] INFO: " +  _clientLogsConfName + " zip folder successfully zipped";
+                LogText += "\n [" + DateTime.Now + "] INFO: " + _clientLogsConfName + " zip folder is under: " + clientLogsConfTempZip;
+            }
         }
 
         /// <summary>
@@ -186,8 +147,14 @@ namespace Logs.ViewModels
         /// </summary>
         private void ExecuteExportServerLogsCommand()
         {
-            LogFunction.CopyLogs(serverLogsPath, serverLogsCopyTemp, true, ServerLogsName);
+            LogFunction.CopyLogs(serverLogsPath, serverLogsCopyTemp, true);
             LogFunction.CreateLogs(serverLogsCopyTemp, serverLogsTempZip, _serverLogsName, serverLogsCopyTemp);
+
+            if (File.Exists(serverLogsTempZip))
+            {
+                LogText += "\n [" + DateTime.Now + "] INFO: " + _serverLogsName + " zip folder successfully zipped";
+                LogText += "\n [" + DateTime.Now + "] INFO: " + _serverLogsName + " zip folder is under: " + serverLogsTempZip;
+            }
         }
 
         /// <summary>

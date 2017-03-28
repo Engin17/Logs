@@ -18,7 +18,7 @@ namespace Logs.Functions
         /// <param name="logPath"></param>
         /// <param name="logCopyTemp"></param>
         /// <param name="copySubDirs"></param>
-        public static void CopyLogs(string logPath, string logCopyTemp, bool copySubDirs, string logName)
+        public static void CopyLogs(string logPath, string logCopyTemp, bool copySubDirs)
         {
             try
             {
@@ -47,17 +47,8 @@ namespace Logs.Functions
                         foreach (DirectoryInfo subdir in dirs)
                         {
                             string temppath = Path.Combine(logCopyTemp, subdir.Name);
-                            CopyLogs(subdir.FullName, temppath, copySubDirs, logName);
+                            CopyLogs(subdir.FullName, temppath, copySubDirs);
                         }
-                    }
-
-                    if (logName == MainViewModel.ClientConfName)
-                    {
-                        MainViewModel.ClientConfCopied = true;
-                    }
-                    if (logName == MainViewModel.ClientLogsName)
-                    {
-                        MainViewModel.ClientLogsCopied = true;
                     }
                 }
 
@@ -65,7 +56,7 @@ namespace Logs.Functions
                 {
                     // delete old copied logs and copy new logs inside the temp folder
                     Directory.Delete(logCopyTemp, true);
-                    CopyLogs(logPath, logCopyTemp, true, logName);
+                    CopyLogs(logPath, logCopyTemp, true);
                 }
 
 
@@ -94,7 +85,7 @@ namespace Logs.Functions
                 if (!fileExist)
                 {
                     ZipFile.CreateFromDirectory(logPath, logTempZip, CompressionLevel.Fastest, true);
-                    MainViewModel.LogText += "\n " + DateTime.Now + ": " + logName + " successfully zipped";
+                    
 
                     if (logName == MainViewModel.ServerLogsName)
                     {
