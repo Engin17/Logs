@@ -5,13 +5,15 @@ using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace Logs.Functions
 {
     public class LogFunction
     {
-
         /// <summary>
         /// Method for copy the server logs, because we can not zip the server logs when the services are running
         /// </summary>
@@ -30,7 +32,6 @@ namespace Logs.Functions
                 if (!Directory.Exists(logCopyTemp))
                 {
                     Directory.CreateDirectory(logCopyTemp);
-
 
                     // Get the files in the directory and copy them to the new location.
                     FileInfo[] files = dir.GetFiles();
@@ -54,7 +55,6 @@ namespace Logs.Functions
 
                 else
                 {
-                    // delete old copied logs and copy new logs inside the temp folder
                     Directory.Delete(logCopyTemp, true);
                     CopyLogs(logPath, logCopyTemp, true);
                 }
@@ -74,36 +74,41 @@ namespace Logs.Functions
         /// </summary>
         /// <param name="logPath"></param>
         /// <param name="logTempZip"></param>
-        public static void CreateLogs(string logPath, string logTempZip, string logName, string logTemp)
+        public static void CreateLogs(string logPath, string logTempZip, string logName)
         {
             // check if logs already exported
             FileInfo sFile = new FileInfo(logTempZip);
             bool fileExist = sFile.Exists;
-           
+
             try
             {
                 if (!fileExist)
-                {
+                {                                                     
                     ZipFile.CreateFromDirectory(logPath, logTempZip, CompressionLevel.Fastest, true);
-                    
 
-                    if (logName == MainViewModel.ServerLogsName)
+                    if (logName == MainViewModel.ClientLogsConfName && File.Exists(MainViewModel.ClientLogsConfTempZip))
                     {
-                        MainViewModel.BtnServerFTPEnabled = true;
+                        MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ClientLogsConfName + " zip folder successfully zipped";
+                        MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ClientLogsConfName + " zip folder is under: " + MainViewModel.ClientLogsConfTempZip;
+                        MainViewModel.IsBtnClientFTPEnabled = true;
                     }
-                    if (logName == MainViewModel.ClientLogsConfName)
+                    else if (File.Exists(MainViewModel.ServerLogsTempZip) && logName == MainViewModel.ServerLogsName)
                     {
-                        MainViewModel.BtnClientFTPEnabled = true;
+                        MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ServerLogsName + " zip folder successfully zipped";
+                        MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ServerLogsName + " zip folder is under: " + MainViewModel.ServerLogsTempZip;
+                        MainViewModel.IsBtnServerFTPEnabled = true;
                     }
+                    Thread.Sleep(500);
+                    MainViewModel.ProgressbarVisibility = Visibility.Hidden;
                 }
                 else
                 {
                     File.Delete(logTempZip);
-                    CreateLogs(logPath, logTempZip, logName, logTemp);
+                    CreateLogs(logPath, logTempZip, logName);
                 }
-                if (Directory.Exists(logTemp))
+                if (Directory.Exists(logPath))
                 {
-                    Directory.Delete(logTemp, true);
+                    Directory.Delete(logPath, true);
                 }
             }
             catch (DirectoryNotFoundException ex)
@@ -141,7 +146,18 @@ namespace Logs.Functions
                     rs.Write(buffer, 0, read);
                 }
                 rs.Flush();
-                MessageBox.Show("File uploaded on FTP", "Succeeded");
+
+                if (file == MainViewModel.ServerLogsTempZip)
+                {
+                    MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ServerLogsName + " zip folder successfully uploaded";
+                    MainViewModel.IsBtnServerFTPEnabled = false;
+                }
+                else if (file == MainViewModel.ClientLogsConfTempZip)
+                {
+                    MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ClientLogsConfName + " zip folder successfully uploaded";
+                    MainViewModel.IsBtnClientFTPEnabled = false;
+                }
+
             }
             catch (Exception ex)
             {
