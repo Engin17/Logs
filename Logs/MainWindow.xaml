@@ -4,15 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Logs.ViewModels"
-        xmlns:func="clr-namespace:Logs.Functions"
         xmlns:local="clr-namespace:Logs"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800" Background="Gray" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-
-    <Window.Resources>
-        <func:LogFunction x:Key="logFunc"/>
-        <vm:MainViewModel x:Key="main" />
-    </Window.Resources>
+        Title="SeeTec Logs" Background="Gray" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
 
     <Window.DataContext>
         <vm:MainViewModel />
@@ -22,28 +16,39 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="100" />
             <RowDefinition Height="100" />
-            <RowDefinition Height="100" />
-            <RowDefinition Height="200" />
+            <RowDefinition Height="70" />
+            <RowDefinition Height="250" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300" />
-            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="150" />
         </Grid.ColumnDefinitions>
 
-        <Button Name="btnServer" Content="Server Logs" Height="50" Width="80" Grid.Row="0" Grid.Column="1" Command="{Binding ExportServerLogsCommand}"/>
-        <Button Name="btnClient" Content="Client Logs" Height="50" Width="80" Grid.Row="0" Grid.Column="0" Command="{Binding ExportClientLogsConfCommand}"/>
-        <Button Name="btnServerFTP" Height="50" Width="80" Grid.Row="1" Grid.Column="1" IsEnabled="{Binding IsBtnServerFTPEnabled}"  Command="{Binding UploadServerFilesFTPCommand}">
-            <TextBlock>Server Logs <LineBreak /> FTP-Server</TextBlock>
-        </Button>
-        <Button Name="btnClientFTP" Height="50" Width="80" Grid.Row="1" Grid.Column="0" IsEnabled="{Binding IsBtnClientFTPEnabled}" Command="{Binding UploadClientFilesFTPCommand}">
-            <TextBlock>Client Logs <LineBreak /> FTP-Server</TextBlock>
+        <Button Content="Server logs" Height="50" Width="80" Grid.Row="0" Grid.Column="5" Command="{Binding ExportServerLogsCommand}" IsEnabled="{Binding IsBtnServerLogsEnabled}"/>
+        <Button Content="Client logs" Height="50" Width="80" Grid.Row="0" Grid.Column="0" Command="{Binding ExportClientLogsConfCommand}" IsEnabled="{Binding IsBtnClientLogsConfEnabled}"/>
+        <Button Height="50" Width="80" Grid.Row="0" Grid.Column="2" Command="{Binding OpenLogsPathCommand}">
+            <TextBlock TextAlignment="Center">Open logs<LineBreak /> zip path</TextBlock>
         </Button>
 
-        <ProgressBar Minimum="0" Maximum="100" Margin="40" Grid.Row="2" IsIndeterminate="true"  Visibility="{Binding ProgressbarVisibility, Source={StaticResource main}}"/>
+        <Button Height="50" Width="80" Grid.Row="1" Grid.Column="5" IsEnabled="{Binding IsBtnServerFTPEnabled}"  Command="{Binding UploadServerFilesFTPCommand}">
+            <TextBlock>Server logs <LineBreak /> FTP-Server</TextBlock>
+        </Button>
+        <Button Height="50" Width="80" Grid.Row="1" Grid.Column="0" IsEnabled="{Binding IsBtnClientFTPEnabled}" Command="{Binding UploadClientFilesFTPCommand}">
+            <TextBlock>Client logs <LineBreak /> FTP-Server</TextBlock>
+        </Button>
+        <Button Height="50" Width="80" Grid.Row="1" Grid.Column="2" IsEnabled="{Binding IsBtnUploadAllFTPEnabled}" Command="{Binding UploadAllFilesFTPCommand}">
+            <TextBlock>Upload all<LineBreak /> logs to FTP</TextBlock>
+        </Button>
 
-        <Border BorderBrush="Gray" BorderThickness="2" Grid.Row="3" Grid.ColumnSpan="2">
-            <TextBox Name="tbLog"  Background="White" Text="{Binding LogText, Source={StaticResource main}}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
-        </Border>
+        <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3">
+            <ProgressBar Height="20" Width="300"  IsIndeterminate="true" Margin="5,5,5,0" Visibility="{Binding ProgressbarVisibility}"/>
+            <TextBox Width="180" TextAlignment="Center" Background="Gray" BorderThickness="0" Text="{Binding TbProgressText}" Visibility="{Binding TbProgressTextEnabled}"/>
+        </StackPanel>
+        
+        <TextBox Background="White" Grid.Row="4" Grid.ColumnSpan="5" Text="{Binding LogText}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderThickness="2" FontSize="13" />
 
     </Grid>
 </Window>

@@ -41,6 +41,7 @@ namespace Logs
             }
 
             InitializeComponent();
+
         }
 
         /// <summary>
