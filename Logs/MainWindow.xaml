@@ -33,21 +33,36 @@
             <TextBlock TextAlignment="Center">Open logs<LineBreak /> zip path</TextBlock>
         </Button>
 
-        <Button Height="50" Width="80" Grid.Row="1" Grid.Column="5" IsEnabled="{Binding IsBtnServerFTPEnabled}"  Command="{Binding UploadServerFilesFTPCommand}">
-            <TextBlock>Server logs <LineBreak /> FTP-Server</TextBlock>
-        </Button>
-        <Button Height="50" Width="80" Grid.Row="1" Grid.Column="0" IsEnabled="{Binding IsBtnClientFTPEnabled}" Command="{Binding UploadClientFilesFTPCommand}">
-            <TextBlock>Client logs <LineBreak /> FTP-Server</TextBlock>
-        </Button>
-        <Button Height="50" Width="80" Grid.Row="1" Grid.Column="2" IsEnabled="{Binding IsBtnUploadAllFTPEnabled}" Command="{Binding UploadAllFilesFTPCommand}">
-            <TextBlock>Upload all<LineBreak /> logs to FTP</TextBlock>
-        </Button>
+        <StackPanel Grid.Row="1" Grid.Column="5">
+            <TextBox Height="20"  Width="80" Margin="5" IsEnabled="{Binding ElementName=BtnServerFTP, Path=IsEnabled}" Text="{Binding TbServerLogsName}"/>
+
+            <Button Name="BtnServerFTP" Height="50" Width="80" IsEnabled="{Binding IsBtnServerFTPEnabled}"  Command="{Binding UploadServerFilesFTPCommand}">
+                <TextBlock>Server logs <LineBreak /> FTP-Server</TextBlock>
+            </Button>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="0">
+            <TextBox Height="20"  Width="80" Margin="5" IsEnabled="{Binding ElementName=BtnClientFTP, Path=IsEnabled}" Text="{Binding TbClientLogsConfName}"/>
+
+
+            <Button Name="BtnClientFTP" Height="50" Width="80" IsEnabled="{Binding IsBtnClientFTPEnabled}" Command="{Binding UploadClientFilesFTPCommand}">
+                <TextBlock>Client logs <LineBreak /> FTP-Server</TextBlock>
+            </Button>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="2">
+            <TextBox Height="20"  Width="80" Margin="5" IsEnabled="{Binding ElementName=BtnAllFTP, Path=IsEnabled}" Text="{Binding TbAllLogsName}"/>
+
+            <Button Name="BtnAllFTP" Height="50" Width="80" Grid.Row="1" Grid.Column="2" IsEnabled="{Binding IsBtnUploadAllFTPEnabled}" Command="{Binding UploadAllFilesFTPCommand}">
+                <TextBlock>Upload all<LineBreak /> logs to FTP</TextBlock>
+            </Button>
+        </StackPanel>
 
         <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3">
             <ProgressBar Height="20" Width="300"  IsIndeterminate="true" Margin="5,5,5,0" Visibility="{Binding ProgressbarVisibility}"/>
-            <TextBox Width="180" TextAlignment="Center" Background="Gray" BorderThickness="0" Text="{Binding TbProgressText}" Visibility="{Binding TbProgressTextEnabled}"/>
+            <TextBox Width="180" TextAlignment="Center" Background="Gray" BorderThickness="0" Text="{Binding TbProgressText}" Visibility="{Binding TbProgressTextVisibility}"/>
         </StackPanel>
-        
+
         <TextBox Background="White" Grid.Row="4" Grid.ColumnSpan="5" Text="{Binding LogText}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderThickness="2" FontSize="13" />
 
     </Grid>

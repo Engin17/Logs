@@ -94,7 +94,7 @@ namespace Logs.Functions
                         MainViewModel.IsBtnUploadAllFTPEnabled = true;
                         Thread.Sleep(500);
                         MainViewModel.ProgressbarVisibility = Visibility.Hidden;
-                        MainViewModel.TbProgressTextEnabled = Visibility.Hidden;
+                        MainViewModel.TbProgressTextVisibility = Visibility.Hidden;
                     }
                     else if (File.Exists(MainViewModel.ServerLogsTempZip) && logName == MainViewModel.ServerLogsName)
                     {
@@ -104,7 +104,7 @@ namespace Logs.Functions
                         MainViewModel.IsBtnUploadAllFTPEnabled = true;
                         Thread.Sleep(500);
                         MainViewModel.ProgressbarVisibility = Visibility.Hidden;
-                        MainViewModel.TbProgressTextEnabled = Visibility.Hidden;
+                        MainViewModel.TbProgressTextVisibility = Visibility.Hidden;
                     }
                     else if (File.Exists(MainViewModel.LogsZipFolderPathZip) && logName == MainViewModel.LogZipFolderName)
                     {
@@ -136,7 +136,7 @@ namespace Logs.Functions
         /// Method to upload files to the FTP server
         /// </summary>
         /// <param name="logPath"></param>
-        public static void UploadLogsFTP(string logPath)
+        public static void UploadLogsFTP(string logPath, string logName)
         {
             FileStream fs = null;
             Stream rs = null;
@@ -145,6 +145,7 @@ namespace Logs.Functions
             {
                 string file = logPath;
                 string uploadFileName = new FileInfo(file).Name;
+                uploadFileName = logName + "_" + uploadFileName;
                 string uploadUrl = "ftp://217.22.207.192/";
                 fs = new FileStream(file, FileMode.Open, FileAccess.Read);
                 string ftpUrl = string.Format("{0}/{1}", uploadUrl, uploadFileName);
@@ -163,7 +164,7 @@ namespace Logs.Functions
 
                 Thread.Sleep(500);
                 MainViewModel.ProgressbarVisibility = Visibility.Hidden;
-                MainViewModel.TbProgressTextEnabled = Visibility.Hidden;
+                MainViewModel.TbProgressTextVisibility = Visibility.Hidden;
             }
             catch (Exception ex)
             {
@@ -214,6 +215,7 @@ namespace Logs.Functions
                 MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ServerLogsName + " zip folder successfully uploaded to the FTP server";
                 MainViewModel.IsBtnServerFTPEnabled = false;
                 MainViewModel.IsBtnUploadAllFTPEnabled = false;
+                MainViewModel.IsBtnClientFTPEnabled = true;
                 DeleteFilesFoldersAfterUpload(MainViewModel.ServerLogsTempZip, MainViewModel.ServerLogsCopyTemp);
 
             }
@@ -222,6 +224,7 @@ namespace Logs.Functions
                 MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ClientLogsConfName + " zip folder successfully uploaded to the FTP server";
                 MainViewModel.IsBtnClientFTPEnabled = false;
                 MainViewModel.IsBtnUploadAllFTPEnabled = false;
+                MainViewModel.IsBtnServerFTPEnabled = true;
                 DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
 
             }
@@ -238,7 +241,6 @@ namespace Logs.Functions
             }
 
         }
-
 
         private static void DeleteFilesFoldersAfterUpload(string file, string folder)
         {
