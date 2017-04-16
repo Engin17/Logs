@@ -5,11 +5,8 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace Logs.Functions
 {
@@ -65,7 +62,7 @@ namespace Logs.Functions
             }
             catch (DirectoryNotFoundException ex)
             {
-                MainViewModel.LogText += "\n [" + DateTime.Now + "] ERROR: " + ex.Message;
+                MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
             }
         }
 
@@ -88,28 +85,22 @@ namespace Logs.Functions
 
                     if (logName == MainViewModel.ClientLogsConfName && File.Exists(MainViewModel.ClientLogsConfTempZip))
                     {
-                        MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ClientLogsConfName + " zip folder successfully zipped";
-                        MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ClientLogsConfName + " zip folder is under: " + MainViewModel.ClientLogsConfTempZip;
-                        MainViewModel.IsBtnClientFTPEnabled = true;
-                        MainViewModel.IsBtnUploadAllFTPEnabled = true;
-                        Thread.Sleep(500);
-                        MainViewModel.ProgressbarVisibility = Visibility.Hidden;
-                        MainViewModel.TbProgressTextVisibility = Visibility.Hidden;
+                        MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextZipSuccess;
+                        MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextZipLocation + MainViewModel.ClientLogsConfTempZip;
+
+                        MainViewModel.UpdatePropertiesCreateLogsAtEnd();
                     }
                     else if (File.Exists(MainViewModel.ServerLogsTempZip) && logName == MainViewModel.ServerLogsName)
                     {
-                        MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ServerLogsName + " zip folder successfully zipped";
-                        MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ServerLogsName + " zip folder is under: " + MainViewModel.ServerLogsTempZip;
-                        MainViewModel.IsBtnServerFTPEnabled = true;
-                        MainViewModel.IsBtnUploadAllFTPEnabled = true;
-                        Thread.Sleep(500);
-                        MainViewModel.ProgressbarVisibility = Visibility.Hidden;
-                        MainViewModel.TbProgressTextVisibility = Visibility.Hidden;
+                        MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextZipSuccess;
+                        MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextZipLocation + MainViewModel.ServerLogsTempZip;
+
+                        MainViewModel.UpdatePropertiesCreateLogsAtEnd();
                     }
                     else if (File.Exists(MainViewModel.LogsZipFolderPathZip) && logName == MainViewModel.LogZipFolderName)
                     {
-                        MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.LogZipFolderName + " zip folder successfully zipped";
-                        MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.LogZipFolderName + " zip folder is under: " + MainViewModel.LogsZipFolderPathZip;
+                        MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogZipFolderName + MainViewModel.LogTextZipSuccess;
+                        MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogZipFolderName + MainViewModel.LogTextZipLocation + MainViewModel.LogsZipFolderPathZip;
                     }
                 }
                 else
@@ -120,15 +111,15 @@ namespace Logs.Functions
                     }
                     catch (FileNotFoundException ex)
                     {
-                        MainViewModel.LogText += "\n [" + DateTime.Now + "] ERROR: " + ex.Message;
+                        MainViewModel.LogText += MainViewModel.LogTextInfo + ex.Message;
                     }
                     CreateLogs(logPath, logTempZip, logName);
                 }
             }
             catch (DirectoryNotFoundException ex)
             {
-                MainViewModel.LogText += "\n [" + DateTime.Now + "] ERROR: " + ex.Message;
-                MainViewModel.LogText += "\n [" + DateTime.Now + "] ERROR: Could not create " + MainViewModel.ClientLogsConfName.ToLower() + " zip folder";
+                MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
+                MainViewModel.LogText += MainViewModel.LogTextError + MainViewModel.LogTextCouldNotCreate + MainViewModel.ClientLogsConfName.ToLower() + MainViewModel.LogTextZipFolder;
             }
         }
 
@@ -168,7 +159,10 @@ namespace Logs.Functions
             }
             catch (Exception ex)
             {
-                MainViewModel.LogText += "\n [" + DateTime.Now + "] ERROR: " + "File upload/transfer Failed.\r\nError Message: " + ex.Message;
+                MainViewModel.LogText += MainViewModel.LogTextError + MainViewModel.LogTextUploadFailed + ex.Message;
+                MainViewModel.IsUploadSucceeded = false;
+                MainViewModel.ProgressbarVisibility = Visibility.Hidden;
+                MainViewModel.TbProgressTextVisibility = Visibility.Hidden;
             }
             finally
             {
@@ -203,43 +197,49 @@ namespace Logs.Functions
             }
             catch (Win32Exception ex)
             {
-                MainViewModel.LogText += "\n [" + DateTime.Now + "] ERROR: " + ex.Message;
+                MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
             }
         }
 
-        public static void StartCleaning(string file)
+        /// <summary>
+        /// Metho
+        /// </summary>
+        private static void StartCleaning(string file)
         {
-            
+
             if (file == MainViewModel.ServerLogsTempZip)
             {
-                MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ServerLogsName + " zip folder successfully uploaded to the FTP server";
-                MainViewModel.IsBtnServerFTPEnabled = false;
-                MainViewModel.IsBtnUploadAllFTPEnabled = false;
-                MainViewModel.IsBtnClientFTPEnabled = true;
-                DeleteFilesFoldersAfterUpload(MainViewModel.ServerLogsTempZip, MainViewModel.ServerLogsCopyTemp);
-
+                if (MainViewModel.IsUploadSucceeded)
+                {
+                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextUploadSucceeded;
+                    DeleteFilesFoldersAfterUpload(MainViewModel.ServerLogsTempZip, MainViewModel.ServerLogsCopyTemp);
+                }
+                MainViewModel.UpdateFTPUploadButons();
             }
+
             else if (file == MainViewModel.ClientLogsConfTempZip)
             {
-                MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.ClientLogsConfName + " zip folder successfully uploaded to the FTP server";
-                MainViewModel.IsBtnClientFTPEnabled = false;
-                MainViewModel.IsBtnUploadAllFTPEnabled = false;
-                MainViewModel.IsBtnServerFTPEnabled = true;
-                DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
-
+                if (MainViewModel.IsUploadSucceeded)
+                {
+                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextUploadSucceeded;
+                    DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
+                }
+                MainViewModel.UpdateFTPUploadButons();                
             }
+
             else if (file == MainViewModel.LogsZipFolderPathZip)
             {
-                MainViewModel.LogText += "\n [" + DateTime.Now + "] INFO: " + MainViewModel.LogZipFolderName + " zip folder successfully uploaded to the FTP server";
-                MainViewModel.IsBtnClientFTPEnabled = false;
-                MainViewModel.IsBtnServerFTPEnabled = false;
-                MainViewModel.IsBtnUploadAllFTPEnabled = false;
-                DeleteFilesFoldersAfterUpload(MainViewModel.ServerLogsTempZip, MainViewModel.ServerLogsCopyTemp);
-                DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
-                DeleteFilesFoldersAfterUpload(MainViewModel.LogsZipFolderPathZip, MainViewModel.LogsTemp);
-
+                if (MainViewModel.IsUploadSucceeded)
+                {
+                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogZipFolderName + MainViewModel.LogTextUploadSucceeded;
+                    DeleteFilesFoldersAfterUpload(MainViewModel.ServerLogsTempZip, MainViewModel.ServerLogsCopyTemp);
+                    DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
+                    DeleteFilesFoldersAfterUpload(MainViewModel.LogsZipFolderPathZip, MainViewModel.LogsTemp);
+                }
+                MainViewModel.UpdateFTPUploadButons();;
             }
-
+            MainViewModel.UpdateFTPUploadButons();
+            MainViewModel.IsUploadSucceeded = true;
         }
 
         private static void DeleteFilesFoldersAfterUpload(string file, string folder)
@@ -251,14 +251,13 @@ namespace Logs.Functions
             }
             catch (FileNotFoundException ex)
             {
-                MainViewModel.LogText += "\n [" + DateTime.Now + "] ERROR: " + ex.Message;
+                MainViewModel.LogText += MainViewModel.LogTextInfo + ex.Message;
             }
             catch (DirectoryNotFoundException ex)
             {
-                MainViewModel.LogText += "\n [" + DateTime.Now + "] ERROR: " + ex.Message;
+                MainViewModel.LogText += MainViewModel.LogTextInfo + ex.Message;
             }
-        }
-
+        }        
     }
 
 }
