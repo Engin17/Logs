@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Threading;
 using System.Net.NetworkInformation;
+using System.IO.Compression;
 
 namespace Logs.ViewModels
 {
@@ -20,13 +21,13 @@ namespace Logs.ViewModels
         #region Member variables
         private static string path = new Uri(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
         private static string path2 = Directory.GetCurrentDirectory();
-        private static readonly string serverLogsPath = @"C:\Program Files\SeeTec\log2";
+        private static readonly string serverLogsPath = @"C:\Program Files\SeeTec\log3";
         private static readonly string _serverLogsTempZip = @"C:\Program Files\SeeTec\TempLogs\ServerLog.zip";
         private static readonly string _serverLogsCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ServerLog";
         private static readonly string _serverLogsName = "Server logs";
 
-        private static readonly string clientLogsPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\log");
-        private static readonly string clientConfPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\conf");
+        private static readonly string clientLogsPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\logz");
+        private static readonly string clientConfPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\confz");
         private static readonly string _clientLogsConfTempZip = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf.zip";
         private static readonly string clientLogCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf\ClientLogs";
         private static readonly string clientConfCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf\ClientConf";
@@ -36,6 +37,8 @@ namespace Logs.ViewModels
         private static readonly string logsZipPath = @"C:\Program Files\SeeTec\TempLogs";
         private static readonly string logsClientConfCopyTemp = @"C:\Program Files\SeeTec\TempLogs\AllLog\ClientLogsConf";
         private static readonly string logsServerCopyTemp = @"C:\Program Files\SeeTec\TempLogs\AllLog\ServerLogs";
+        private static readonly string _logsClientConfCopyTempZip = @"C:\Program Files\SeeTec\TempLogs\AllLog\ClientLogsConf.zip";
+        private static readonly string _logsServerCopyTempZip = @"C:\Program Files\SeeTec\TempLogs\AllLog\ServerLog.zip";
         private static readonly string _logsZipFolderPathZip = @"C:\Program Files\SeeTec\TempLogs\AllLog.zip";
         private static readonly string _logsTemp = @"C:\Program Files\SeeTec\TempLogs\AllLog";
         private static readonly string _logZipFolderName = "Server, client logs and configuration";
@@ -51,6 +54,8 @@ namespace Logs.ViewModels
         private static bool _isBtnClientLogsConfEnabled = true;
         private static bool _isBtnServerLogsEnabled = true;
 
+        private static bool _isInternetConnectionAvailable = true;
+
         private static string _logText = "Welcome!!! \n";
         private static readonly string _logTextError = "\n [" + DateTime.Now + "] ERROR: ";
         private static readonly string _logTextInfo = "\n [" + DateTime.Now + "] INFO: ";
@@ -60,6 +65,12 @@ namespace Logs.ViewModels
         private static readonly string _logTextZipFolder = " zip folder";
         private static readonly string _logTextUploadFailed = "File upload Failed.\r\n Error Message: ";
         private static readonly string _logTextUploadSucceeded = " zip folder successfully uploaded to the SeeTec FTP server";
+        private static readonly string _logTextNoInternet = "No internet connection available. FTP upload disabled";
+        private static readonly string _logTextFolderSize = "The log folder size is ";
+        private static readonly string _logTextFolderBePatientMB = " MB. \n Creating log zip folder may take some time. Please be patient.";
+        private static readonly string _logTextFolderBePatientGB = " GB. \n Creating log zip folder may take some time. Please be patient.";
+        private static readonly string _logTextZipSize = "The zip folder size is ";
+        private static readonly string _logTextZipBePatientMB = " MB. \n Uploading zip folder may take some time. Please be patient.";
 
         private static string _tbProgressText = "";
         private static readonly string progressTextCreateClientfiles = "Please wait... \ncreating client files zip folder";
@@ -84,7 +95,6 @@ namespace Logs.ViewModels
             set
             {
                 _isUploadSucceeded = value;
-                RaiseStaticPropertyChanged();
             }
         }
         public static bool IsClientLogsConfCreated
@@ -93,7 +103,6 @@ namespace Logs.ViewModels
             set
             {
                 _isClientLogsConfCreated = value;
-                RaiseStaticPropertyChanged();
             }
         }
 
@@ -103,7 +112,6 @@ namespace Logs.ViewModels
             set
             {
                 _isServerlogsCreated = value;
-                RaiseStaticPropertyChanged();
             }
         }
 
@@ -112,7 +120,7 @@ namespace Logs.ViewModels
             get { return _isBtnClientFTPEnabled; }
             set
             {
-                if (File.Exists(ClientLogsConfTempZip) && CheckInternetConnection())
+                if (File.Exists(ClientLogsConfTempZip) && IsInternetConnectionAvailable)
                 {
                     _isBtnClientFTPEnabled = value;
                 }
@@ -129,7 +137,7 @@ namespace Logs.ViewModels
             get { return _isBtnServerFTPEnabled; }
             set
             {
-                if (File.Exists(ServerLogsTempZip))
+                if (File.Exists(ServerLogsTempZip) && IsInternetConnectionAvailable)
                 {
                     _isBtnServerFTPEnabled = value;
                 }
@@ -178,6 +186,15 @@ namespace Logs.ViewModels
             }
         }
 
+        public static bool IsInternetConnectionAvailable
+        {
+            get { return _isInternetConnectionAvailable; }
+            set
+            {
+                _isInternetConnectionAvailable = value;
+            }
+        }
+
         public static string ServerLogsName
         {
             get { return _serverLogsName; }
@@ -221,6 +238,16 @@ namespace Logs.ViewModels
         public static string ClientLogsConfTemp
         {
             get { return _clientLogsConfTemp; }
+        }
+
+        public static string LogsClientConfCopyTempZip
+        {
+            get { return _logsClientConfCopyTempZip; }
+        }
+
+        public static string LogsServerCopyTempZip
+        {
+            get { return _logsServerCopyTempZip; }
         }
 
         #region Logs Properties
@@ -272,6 +299,36 @@ namespace Logs.ViewModels
         public static string LogTextUploadSucceeded
         {
             get { return _logTextUploadSucceeded; }
+        }
+
+        public static string LogTextNoInternet
+        {
+            get { return _logTextNoInternet; }
+        }
+
+        public static string LogTextFolderSize
+        {
+            get { return _logTextFolderSize; }
+        }
+
+        public static string LogTextFolderBePatientMB
+        {
+            get { return _logTextFolderBePatientMB; }
+        }
+
+        public static string LogTextFolderBePatientGB
+        {
+            get { return _logTextFolderBePatientGB; }
+        }
+
+        public static string LogTextZipSize
+        {
+            get { return _logTextZipSize; }
+        }
+
+        public static string LogTextZipBePatientMB
+        {
+            get { return _logTextZipBePatientMB; }
         }
         #endregion
 
@@ -384,6 +441,12 @@ namespace Logs.ViewModels
             UploadServerFilesFTPCommand = new RelayCommand(() => ExecuteUploadServerFilesFTPCommand());
             OpenLogsPathCommand = new RelayCommand(() => ExecuteOpenLogsPathCommand());
             UploadAllFilesFTPCommand = new RelayCommand(() => ExecuteUploadAllFilesFTPCommand());
+           
+            if (!LogFunction.CheckInternetConnection())
+            {
+                IsInternetConnectionAvailable = false;
+                LogText += LogTextInfo + LogTextNoInternet;
+            }
 
             // Enable upload buttons if zip file already exists
             IsBtnClientFTPEnabled = true;
@@ -399,10 +462,9 @@ namespace Logs.ViewModels
         /// </summary>
         private void ExecuteExportClientLogsConfCommand()
         {
-            IsBtnClientLogsConfEnabled = false;
             UpdatePropertiesCreateLogsAtStart(progressTextCreateClientfiles);
 
-            Thread t = new Thread(new ThreadStart(StartCreatingClientLogsConf));
+            Thread t = new Thread(new ThreadStart(StartCreatingClientLogsConfLogs));
             t.Start();
         }
 
@@ -412,7 +474,6 @@ namespace Logs.ViewModels
         /// </summary>
         private void ExecuteExportServerLogsCommand()
         {
-            IsBtnServerLogsEnabled = false;
             UpdatePropertiesCreateLogsAtStart(progressTextCreateServerfiles);
 
             Thread t = new Thread(new ThreadStart(StartCreatingServerLogs));
@@ -469,10 +530,9 @@ namespace Logs.ViewModels
         private void StartCreatingServerLogs()
         {
             LogFunction.CopyLogs(serverLogsPath, ServerLogsCopyTemp, true);
+            LogFunction.CheckFolderSize(ServerLogsCopyTemp);
 
             LogFunction.CreateLogs(ServerLogsCopyTemp, ServerLogsTempZip, ServerLogsName);
-
-            IsBtnServerLogsEnabled = true;
         }
 
         /// <summary>
@@ -482,14 +542,13 @@ namespace Logs.ViewModels
         /// Third zip the copied logs and conf
         /// At last enable create client logs and conf button
         /// </summary>
-        private void StartCreatingClientLogsConf()
+        private void StartCreatingClientLogsConfLogs()
         {
             LogFunction.CopyLogs(clientLogsPath, clientLogCopyTemp, true);
             LogFunction.CopyLogs(clientConfPath, clientConfCopyTemp, true);
+            LogFunction.CheckFolderSize(ClientLogsConfTemp);
 
             LogFunction.CreateLogs(ClientLogsConfTemp, ClientLogsConfTempZip, ClientLogsConfName);
-
-            IsBtnClientLogsConfEnabled = true;
         }
 
         /// <summary>
@@ -497,6 +556,7 @@ namespace Logs.ViewModels
         /// </summary>
         private void StartUploadingClientFilesFTP()
         {
+            LogFunction.CheckZipSize(ClientLogsConfTempZip);
             LogFunction.UploadLogsFTP(ClientLogsConfTempZip, TbClientLogsConfName);
 
             UpdateCreateLogsButtonProperties();
@@ -517,9 +577,7 @@ namespace Logs.ViewModels
         /// </summary>
         private void StartUploadingAllFilesFTP()
         {
-            LogFunction.CopyLogs(_clientLogsConfTemp, logsClientConfCopyTemp, true);
-            LogFunction.CopyLogs(_serverLogsCopyTemp, logsServerCopyTemp, true);
-
+            LogFunction.CopyClientServerZipFolder();
             LogFunction.CreateLogs(LogsTemp, LogsZipFolderPathZip, LogZipFolderName);
 
             LogFunction.UploadLogsFTP(LogsZipFolderPathZip, TbAllLogsName);
@@ -530,13 +588,14 @@ namespace Logs.ViewModels
         #region Update properties methods
         private void UpdatePropertiesCreateLogsAtStart(string progressText)
         {
+            IsBtnClientFTPEnabled = false;
+            IsBtnServerFTPEnabled = false;
+            IsBtnUploadAllFTPEnabled = false;
+            IsBtnServerLogsEnabled = false;
+            IsBtnClientLogsConfEnabled = false;
             ProgressbarVisibility = Visibility.Visible;
             TbProgressText = progressText;
-            TbProgressTextVisibility = Visibility.Visible;
-
-            IsBtnClientFTPEnabled = true;
-            IsBtnServerFTPEnabled = true;
-            IsBtnUploadAllFTPEnabled = true;
+            TbProgressTextVisibility = Visibility.Visible;           
         }
 
         public static void UpdatePropertiesCreateLogsAtEnd()
@@ -544,6 +603,8 @@ namespace Logs.ViewModels
             IsBtnServerFTPEnabled = true;
             IsBtnClientFTPEnabled = true;
             IsBtnUploadAllFTPEnabled = true;
+            IsBtnServerLogsEnabled = true;
+            IsBtnClientLogsConfEnabled = true;
             Thread.Sleep(500);
             ProgressbarVisibility = Visibility.Hidden;
             TbProgressTextVisibility = Visibility.Hidden;
@@ -574,25 +635,6 @@ namespace Logs.ViewModels
             IsBtnUploadAllFTPEnabled = true;
         }
         #endregion
-
-        /// <summary>
-        /// Method to check internet connection 
-        /// </summary>
-        public static bool CheckInternetConnection()
-        {
-            Ping ping = new Ping();
-
-            try
-            {
-                PingReply reply = ping.Send("www.google.de", 100);
-
-                return reply.Status == IPStatus.Success;
-            }
-            catch
-            {
-                return false;
-            }
-        }
 
         // This method is called by the set accessor of static properties.
         // The CallerMemberName attribute that is applied to the optional propertyName
@@ -627,9 +669,9 @@ namespace Logs.ViewModels
                     Directory.Delete(_logsTemp, true);
                 }
             }
-            catch (DirectoryNotFoundException ex)
+            catch (DirectoryNotFoundException)
             {
-                LogText += "\n [" + DateTime.Now + "] ERROR: " + ex.Message;
+                
             }
         }
     }

@@ -4,7 +4,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Threading;
 using System.Windows;
 
@@ -81,6 +83,7 @@ namespace Logs.Functions
             {
                 if (!fileExist)
                 {
+                    
                     ZipFile.CreateFromDirectory(logPath, logTempZip, CompressionLevel.Fastest, true);
 
                     if (logName == MainViewModel.ClientLogsConfName && File.Exists(MainViewModel.ClientLogsConfTempZip))
@@ -201,6 +204,27 @@ namespace Logs.Functions
             }
         }
 
+        public static void CopyClientServerZipFolder()
+        {
+            if (!Directory.Exists(MainViewModel.LogsTemp))
+            {
+                Directory.CreateDirectory(MainViewModel.LogsTemp);
+            }
+
+            try
+            {
+                // Will not overwrite if the destination file already exists.
+                File.Copy(MainViewModel.ClientLogsConfTempZip, MainViewModel.LogsClientConfCopyTempZip, true);
+                File.Copy(MainViewModel.ServerLogsTempZip, MainViewModel.LogsServerCopyTempZip, true);
+            }
+
+            // Catch exception if the file was already copied.
+            catch (IOException ex)
+            {
+                MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
+            }
+        }
+
         /// <summary>
         /// Metho
         /// </summary>
@@ -257,7 +281,60 @@ namespace Logs.Functions
             {
                 MainViewModel.LogText += MainViewModel.LogTextInfo + ex.Message;
             }
-        }        
+        }
+
+        /// <summary>
+        /// Method to check internet connection 
+        /// </summary>
+        public static bool CheckInternetConnection()
+        {
+            Ping ping = new Ping();
+
+            try
+            {
+                PingReply reply = ping.Send("www.google.com", 100);
+
+                return reply.Status == IPStatus.Success;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static void CheckFolderSize(string logPath)
+        {
+            try
+            {
+                long length = Directory.GetFiles(logPath, "*", SearchOption.AllDirectories).Sum(t => (new FileInfo(t).Length));
+                double size = Math.Round((length / 1024d) / 1024d, 2);
+                size = Math.Round(size, 2);
+
+
+                if (size > 1000d)
+                {
+                    size = Math.Round(size / 1000d, 2);
+
+                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextFolderSize + size + MainViewModel.LogTextFolderBePatientGB;
+                }
+                else if (size > 300d)
+                {
+                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextFolderSize + size + MainViewModel.LogTextFolderBePatientMB;
+                }
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                MainViewModel.LogText += "\n Not found";
+            }
+        }
+
+        public static void CheckZipSize(string zipPath)
+        {
+            // Depending on the internet speed and the size of the zip folder the upload may take some time. please be patient and wait until the logs are uploaded to the FTP server
+            long length = new FileInfo(MainViewModel.ClientLogsConfTempZip).Length;
+            double size = Math.Round((length / 1204d) / 1024d, 2);
+            MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextZipSize + size + MainViewModel.LogTextZipBePatientMB;
+        }
     }
 
 }
