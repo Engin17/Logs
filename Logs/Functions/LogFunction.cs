@@ -3,17 +3,20 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Windows;
+using Ionic.Zip;
 
 namespace Logs.Functions
 {
     public class LogFunction
     {
+        // Global static field for the log create process problem
+        private static bool logProblem = false;
+
         /// <summary>
         /// Method for copy the server logs, because we can not zip the server logs when the services are running
         /// </summary>
@@ -83,28 +86,31 @@ namespace Logs.Functions
             {
                 if (!fileExist)
                 {
-                    
-                    ZipFile.CreateFromDirectory(logPath, logTempZip, CompressionLevel.Fastest, true);
+                    using (ZipFile zip = new ZipFile())
+                    {
+                        zip.AddDirectory(logPath);
+                        if (!MainViewModel.IsUploadingAllLogs)
+                        {
+                            zip.SaveProgress += ZipSaveProgress;
+                        }
+                        zip.Save(logTempZip);
+                    }
 
                     if (logName == MainViewModel.ClientLogsConfName && File.Exists(MainViewModel.ClientLogsConfTempZip))
                     {
                         MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextZipSuccess;
-                        MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextZipLocation + MainViewModel.ClientLogsConfTempZip;
+                        MainViewModel.LogText += MainViewModel.ClientLogsConfTempZip;
 
                         MainViewModel.UpdatePropertiesCreateLogsAtEnd();
                     }
                     else if (File.Exists(MainViewModel.ServerLogsTempZip) && logName == MainViewModel.ServerLogsName)
                     {
                         MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextZipSuccess;
-                        MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextZipLocation + MainViewModel.ServerLogsTempZip;
+                        MainViewModel.LogText += MainViewModel.ServerLogsTempZip;
 
                         MainViewModel.UpdatePropertiesCreateLogsAtEnd();
                     }
-                    else if (File.Exists(MainViewModel.LogsZipFolderPathZip) && logName == MainViewModel.LogZipFolderName)
-                    {
-                        MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogZipFolderName + MainViewModel.LogTextZipSuccess;
-                        MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogZipFolderName + MainViewModel.LogTextZipLocation + MainViewModel.LogsZipFolderPathZip;
-                    }
+          
                 }
                 else
                 {
@@ -126,6 +132,27 @@ namespace Logs.Functions
             }
         }
 
+        private static void ZipSaveProgress(object sender, SaveProgressEventArgs e)
+        {
+
+            try
+            {
+                if (e.EventType == ZipProgressEventType.Saving_BeforeWriteEntry && logProblem == false)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        MainViewModel.ProgressBarMaximum = e.EntriesTotal;
+                        MainViewModel.ProgressBarValue = e.EntriesSaved + 1;
+                    });
+                }
+            }
+            catch (NullReferenceException)
+            {
+                // If user quits programm during the create logs process
+                logProblem = true;
+            }
+        }
+
         /// <summary>
         /// Method to upload files to the FTP server
         /// </summary>
@@ -137,6 +164,7 @@ namespace Logs.Functions
 
             try
             {
+                FileInfo fileInf = new FileInfo(logPath);
                 string file = logPath;
                 string uploadFileName = new FileInfo(file).Name;
                 uploadFileName = logName + "_" + uploadFileName;
@@ -148,17 +176,23 @@ namespace Logs.Functions
                 requestObj.Credentials = new NetworkCredential("anonymous", "");
                 rs = requestObj.GetRequestStream();
 
-                byte[] buffer = new byte[8092];
-                int read = 0;
-                while ((read = fs.Read(buffer, 0, buffer.Length)) != 0)
+                byte[] buffer = new byte[8192];
+                int read = fs.Read(buffer, 0, buffer.Length);
+
+                long transfered = 0;
+                MainViewModel.ProgressBarMaximum = fileInf.Length;
+
+                while (read > 0)
                 {
                     rs.Write(buffer, 0, read);
+
+                    transfered += read;
+                    MainViewModel.ProgressBarValue = transfered;
+
+                    read = fs.Read(buffer, 0, buffer.Length);
                 }
                 rs.Flush();
 
-                Thread.Sleep(500);
-                MainViewModel.ProgressbarVisibility = Visibility.Hidden;
-                MainViewModel.TbProgressTextVisibility = Visibility.Hidden;
             }
             catch (Exception ex)
             {
@@ -248,7 +282,7 @@ namespace Logs.Functions
                     MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextUploadSucceeded;
                     DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
                 }
-                MainViewModel.UpdateFTPUploadButons();                
+                MainViewModel.UpdateFTPUploadButons();
             }
 
             else if (file == MainViewModel.LogsZipFolderPathZip)
@@ -260,7 +294,7 @@ namespace Logs.Functions
                     DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
                     DeleteFilesFoldersAfterUpload(MainViewModel.LogsZipFolderPathZip, MainViewModel.LogsTemp);
                 }
-                MainViewModel.UpdateFTPUploadButons();;
+                MainViewModel.UpdateFTPUploadButons(); ;
             }
             MainViewModel.UpdateFTPUploadButons();
             MainViewModel.IsUploadSucceeded = true;
@@ -273,13 +307,13 @@ namespace Logs.Functions
                 File.Delete(file);
                 Directory.Delete(folder, true);
             }
-            catch (FileNotFoundException ex)
+            catch (FileNotFoundException)
             {
-                MainViewModel.LogText += MainViewModel.LogTextInfo + ex.Message;
+                //Do nothing. Not important
             }
-            catch (DirectoryNotFoundException ex)
+            catch (DirectoryNotFoundException)
             {
-                MainViewModel.LogText += MainViewModel.LogTextInfo + ex.Message;
+                //Do nothing. Not important
             }
         }
 
@@ -292,9 +326,18 @@ namespace Logs.Functions
 
             try
             {
-                PingReply reply = ping.Send("www.google.com", 100);
+                PingReply reply = ping.Send("www.google.com", 200);
 
-                return reply.Status == IPStatus.Success;
+                if (reply.Status == IPStatus.Success)
+                {
+                    return true;
+                }
+                else
+                {
+                    reply = ping.Send("www.bing.com", 300);
+                    return reply.Status == IPStatus.Success;
+                }
+
             }
             catch
             {
@@ -330,10 +373,14 @@ namespace Logs.Functions
 
         public static void CheckZipSize(string zipPath)
         {
-            // Depending on the internet speed and the size of the zip folder the upload may take some time. please be patient and wait until the logs are uploaded to the FTP server
-            long length = new FileInfo(MainViewModel.ClientLogsConfTempZip).Length;
+            long length = new FileInfo(zipPath).Length;
             double size = Math.Round((length / 1204d) / 1024d, 2);
             MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextZipSize + size + MainViewModel.LogTextZipBePatientMB;
+        }
+
+        public static void LogsNotAvailable(string logName)
+        {
+            MainViewModel.LogText += MainViewModel.LogTextInfo + logName + MainViewModel.LogTextLogsNotAvailabe;
         }
     }
 

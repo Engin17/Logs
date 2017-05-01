@@ -6,11 +6,22 @@
         xmlns:vm="clr-namespace:Logs.ViewModels"
         xmlns:local="clr-namespace:Logs"
         mc:Ignorable="d"
-        Title="SeeTec Logs" Background="Gray" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Width="645" Icon="Resources/SeeTec.ico" >
+        Title="SeeTec Logs" Background="#4d535e" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Width="645" Height="620" Icon="Resources/SeeTec.ico" >
 
     <Window.DataContext>
         <vm:MainViewModel />
     </Window.DataContext>
+
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground"
+                            Value="{StaticResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -21,11 +32,11 @@
             <RowDefinition Height="250" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="40" />
+            <ColumnDefinition Width="180" />
+            <ColumnDefinition Width="60" />
             <ColumnDefinition Width="150" />
-            <ColumnDefinition Width="40" />
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="60" />
+            <ColumnDefinition Width="180" />
         </Grid.ColumnDefinitions>
 
         <Button Content="Server logs" Height="50" Width="90" Grid.Row="1" Grid.Column="5" Command="{Binding ExportServerLogsCommand}" IsEnabled="{Binding IsBtnServerLogsEnabled}"/>
@@ -38,7 +49,7 @@
             <TextBox Height="20" Width="90" Margin="5" IsEnabled="{Binding ElementName=BtnServerFTP, Path=IsEnabled}" Text="{Binding TbServerLogsName}"/>
 
             <Button Name="BtnServerFTP" Height="50" Width="90" IsEnabled="{Binding IsBtnServerFTPEnabled}"  Command="{Binding UploadServerFilesFTPCommand}">
-                <TextBlock>Server logs <LineBreak /> FTP-Server</TextBlock>
+                <TextBlock TextAlignment="Center"> Server logs <LineBreak /> FTP-Server</TextBlock>
             </Button>
         </StackPanel>
 
@@ -60,8 +71,8 @@
         </StackPanel>
 
         <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3">
-            <ProgressBar Height="15" Width="300"  IsIndeterminate="true" Margin="5,10,5,2" Visibility="{Binding ProgressbarVisibility}"/>
-            <TextBox Width="210" TextAlignment="Center" Background="Gray" BorderThickness="0" Text="{Binding TbProgressText}" Visibility="{Binding TbProgressTextVisibility}"/>
+            <ProgressBar  IsIndeterminate="{Binding IsIndeterminate}" Minimum="0" Height="15"   Maximum="{Binding ProgressBarMaximum}" Value="{Binding ProgressBarValue}" Margin="5,10,5,2" Visibility="{Binding ProgressbarVisibility}" />
+            <TextBox Foreground="#d2d1d3" Width="210" TextAlignment="Center" Background="#4d535e" BorderThickness="0" Text="{Binding TbProgressText}" Visibility="{Binding TbProgressTextVisibility}"/>
         </StackPanel>
 
         <TextBox Background="White" Grid.Row="4" Grid.ColumnSpan="5" Text="{Binding LogText}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderThickness="2" FontSize="13" />

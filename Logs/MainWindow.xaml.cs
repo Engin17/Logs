@@ -41,7 +41,6 @@ namespace Logs
             }
 
             InitializeComponent();
-
         }
 
         /// <summary>
@@ -64,6 +63,6 @@ namespace Logs
                 //Do nothing. Probably the user canceled the UAC window
             }
             return false;
-        }
+        }       
     }
 }
