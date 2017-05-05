@@ -89,13 +89,14 @@ namespace Logs.ViewModels
         private static readonly string _logTextZipFolder = " zip folder";
         private static readonly string _logTextUploadFailed = "File upload Failed.\r\n Error Message: ";
         private static readonly string _logTextUploadSucceeded = " zip folder successfully uploaded to the SeeTec FTP server. \n Please inform support staff that the logs are uploaded to the FTP server";
+        private static readonly string _logTextUploadSuccess = " zip folder successfully uploaded";
         private static readonly string _logTextNoInternet = "No internet connection available. FTP upload disabled";
         private static readonly string _logTextFolderSize = "The log folder size is about ";
         private static readonly string _logTextFolderBePatientMB = " MB. \n Creating log zip folder may take some time. Please be patient.";
         private static readonly string _logTextFolderBePatientGB = " GB. \n Creating log zip folder may take some time. Please be patient.";
         private static readonly string _logTextZipSize = "The zip folder size is about ";
         private static readonly string _logTextZipBePatientMB = " MB. \n Depending on the internet speed and the size of the zip folder the upload may take some time. \n Please be patient and wait until the logs are uploaded to the FTP server";
-        private static readonly string _logTextLogsNotAvailabe = " are not available. Logs zip folder cannot be created";
+        private static readonly string _logTextLogsNotAvailabe = " are not available. Logs zip folder cannot be created.";
 
         private static string _tbProgressText = "";
         private static readonly string progressTextCreateClientfiles = "Please wait... \ncreating client files zip folder";
@@ -112,6 +113,9 @@ namespace Logs.ViewModels
         private static Visibility _progressbarVisibility = Visibility.Hidden;
         private static long _progressBarMaximum = 100;
         private static long _progressBarValue = 0;
+
+        // FileSystemWatcher variable. Watches whether a created zip file was deleted oder renamed
+        FileSystemWatcher watcher;
         #endregion
 
         #region Property members
@@ -361,6 +365,11 @@ namespace Logs.ViewModels
             get { return _logTextUploadSucceeded; }
         }
 
+        public static string LogTextUploadSuccess
+        {
+            get { return _logTextUploadSuccess; }
+        }
+
         public static string LogTextNoInternet
         {
             get { return _logTextNoInternet; }
@@ -552,6 +561,8 @@ namespace Logs.ViewModels
             }
 
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
+
+            FSWInitialize();
         }
 
         /// <summary>
@@ -678,7 +689,7 @@ namespace Logs.ViewModels
         {
             IsUploadingAllLogs = true;
             LogFunction.CopyClientServerZipFolder();
-            LogFunction.CreateLogs(LogsTemp, LogsZipFolderPathZip, LogZipFolderName);        
+            LogFunction.CreateLogs(LogsTemp, LogsZipFolderPathZip, LogZipFolderName);
 
             LogFunction.CheckZipSize(LogsZipFolderPathZip);
             LogFunction.UploadLogsFTP(LogsZipFolderPathZip, TbAllLogsName);
@@ -686,7 +697,7 @@ namespace Logs.ViewModels
             UpdateCreateLogsButtonProperties();
         }
 
-        #region Update properties methods
+        #region Update properties members
         private void UpdatePropertiesCreateLogsAtStart(string progressText)
         {
             ProgressBarValue = 0;
@@ -700,15 +711,15 @@ namespace Logs.ViewModels
             TbProgressTextVisibility = Visibility.Visible;
         }
 
-        public static void UpdatePropertiesCreateLogsAtEnd()
+        public static void UpdatePropertiesCreateLogsAtEnd(string logZipName)
         {
+            TbProgressText = logZipName + "\n" + LogTextZipSuccess;
             IsBtnServerFTPEnabled = true;
             IsBtnClientFTPEnabled = true;
             IsBtnUploadAllFTPEnabled = true;
             IsBtnServerLogsEnabled = true;
             IsBtnClientLogsConfEnabled = true;
             ProgressbarVisibility = Visibility.Hidden;
-            TbProgressTextVisibility = Visibility.Hidden;
             ProgressBarValue = 0;
         }
 
@@ -730,10 +741,17 @@ namespace Logs.ViewModels
             IsBtnClientLogsConfEnabled = true;
         }
 
-        public static void UpdateFTPUploadButons()
+        public static void UpdateFTPUploadButtons(string logZipName)
         {
             ProgressbarVisibility = Visibility.Hidden;
-            TbProgressTextVisibility = Visibility.Hidden;
+            TbProgressText = logZipName + "\n" + LogTextUploadSuccess;
+            IsBtnClientFTPEnabled = true;
+            IsBtnServerFTPEnabled = true;
+            IsBtnUploadAllFTPEnabled = true;
+        }
+
+        private static void UpdateFTPButtonsAfterDeleteZipFile()
+        {
             IsBtnClientFTPEnabled = true;
             IsBtnServerFTPEnabled = true;
             IsBtnUploadAllFTPEnabled = true;
@@ -783,5 +801,49 @@ namespace Logs.ViewModels
 
             }
         }
+
+        #region FileSystemWatcher Members
+        /// <summary>
+        /// Listens to the file system change notifications and raises events when a zip file in a directory, changes.
+        /// </summary>
+        private void FSWInitialize()
+        {
+            // If temp folder doesnt exist then we have to create the temp folder for the zip files 
+            if (!Directory.Exists(logsZipPath))
+            {
+                LogFunction.CreateTempLogsFolder(logsZipPath);
+            }
+
+            if (Directory.Exists(logsZipPath))
+            {
+                // Create a new FileSystemWatcher and set its properties.
+                watcher = new FileSystemWatcher();
+
+                // Set path and filter. Only watch zip files
+                watcher.Path = logsZipPath;
+                watcher.Filter = "*.zip";
+
+                // Add event handlers.
+                watcher.Deleted += new FileSystemEventHandler(FSW_Deleted);
+                watcher.Renamed += new RenamedEventHandler(FSW_Renamed);
+
+                // Begin watching.
+                watcher.EnableRaisingEvents = true;
+            }
+        }
+
+        // Define the event handlers.
+        void FSW_Renamed(object sender, RenamedEventArgs e)
+        {
+            // Specify what is done when a zip file is deleted.
+            UpdateFTPButtonsAfterDeleteZipFile();
+        }
+
+        void FSW_Deleted(object sender, FileSystemEventArgs e)
+        {
+            // Specify what is done when a zip file is renamed.
+            UpdateFTPButtonsAfterDeleteZipFile();
+        }
+        #endregion
     }
 }

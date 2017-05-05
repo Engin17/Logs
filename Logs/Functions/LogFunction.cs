@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Threading;
 using System.Windows;
 using Ionic.Zip;
 
@@ -93,6 +92,8 @@ namespace Logs.Functions
                         {
                             zip.SaveProgress += ZipSaveProgress;
                         }
+                        zip.BufferSize = 1000000;
+                        zip.CodecBufferSize = 1000000;
                         zip.Save(logTempZip);
                     }
 
@@ -101,14 +102,14 @@ namespace Logs.Functions
                         MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextZipSuccess;
                         MainViewModel.LogText += MainViewModel.ClientLogsConfTempZip;
 
-                        MainViewModel.UpdatePropertiesCreateLogsAtEnd();
+                        MainViewModel.UpdatePropertiesCreateLogsAtEnd(MainViewModel.ClientLogsConfName);
                     }
                     else if (File.Exists(MainViewModel.ServerLogsTempZip) && logName == MainViewModel.ServerLogsName)
                     {
                         MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextZipSuccess;
                         MainViewModel.LogText += MainViewModel.ServerLogsTempZip;
 
-                        MainViewModel.UpdatePropertiesCreateLogsAtEnd();
+                        MainViewModel.UpdatePropertiesCreateLogsAtEnd(MainViewModel.ServerLogsName);
                     }
           
                 }
@@ -199,7 +200,8 @@ namespace Logs.Functions
                 MainViewModel.LogText += MainViewModel.LogTextError + MainViewModel.LogTextUploadFailed + ex.Message;
                 MainViewModel.IsUploadSucceeded = false;
                 MainViewModel.ProgressbarVisibility = Visibility.Hidden;
-                MainViewModel.TbProgressTextVisibility = Visibility.Hidden;
+                MainViewModel.TbProgressText = ex.Message;
+                //MainViewModel.TbProgressTextVisibility = Visibility.Hidden;
             }
             finally
             {
@@ -227,12 +229,24 @@ namespace Logs.Functions
             {
                 if (!Directory.Exists(zipPath))
                 {
-                    Directory.CreateDirectory(zipPath);
+                    CreateTempLogsFolder(zipPath);
                 }
                 // Open log zip folder with task manager
                 Process.Start(zipPath);
             }
             catch (Win32Exception ex)
+            {
+                MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
+            }
+        }
+
+        public static void CreateTempLogsFolder(string tempPath)
+        {
+            try
+            {
+                Directory.CreateDirectory(tempPath);
+            }
+            catch (Exception ex)
             {
                 MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
             }
@@ -272,7 +286,7 @@ namespace Logs.Functions
                     MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextUploadSucceeded;
                     DeleteFilesFoldersAfterUpload(MainViewModel.ServerLogsTempZip, MainViewModel.ServerLogsCopyTemp);
                 }
-                MainViewModel.UpdateFTPUploadButons();
+                MainViewModel.UpdateFTPUploadButtons(MainViewModel.ServerLogsName);
             }
 
             else if (file == MainViewModel.ClientLogsConfTempZip)
@@ -282,7 +296,7 @@ namespace Logs.Functions
                     MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextUploadSucceeded;
                     DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
                 }
-                MainViewModel.UpdateFTPUploadButons();
+                MainViewModel.UpdateFTPUploadButtons(MainViewModel.ClientLogsConfName);
             }
 
             else if (file == MainViewModel.LogsZipFolderPathZip)
@@ -294,9 +308,9 @@ namespace Logs.Functions
                     DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
                     DeleteFilesFoldersAfterUpload(MainViewModel.LogsZipFolderPathZip, MainViewModel.LogsTemp);
                 }
-                MainViewModel.UpdateFTPUploadButons(); ;
+                MainViewModel.UpdateFTPUploadButtons(MainViewModel.LogZipFolderName); ;
             }
-            MainViewModel.UpdateFTPUploadButons();
+            //MainViewModel.UpdateFTPUploadButtons("");
             MainViewModel.IsUploadSucceeded = true;
         }
 
