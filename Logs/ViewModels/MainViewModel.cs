@@ -17,51 +17,52 @@ namespace Logs.ViewModels
     public class MainViewModel
     {
         #region Member variables
+        // The executable of the tool will be located in SeeTec/tools/Logs. To find the server logs we go to folders up
         private static string seeTecInstallPath = Directory.GetParent(Directory.GetParent(Environment.CurrentDirectory).ToString()).ToString();
 
-        //private static string _serverLogsPath = seeTecInstallPath + @"\log";
-        private static readonly string _serverLogsPath = @"C:\Program Files\SeeTec\log";
+        private static string _serverLogsPath = seeTecInstallPath + @"\log";
+        //private static readonly string _serverLogsPath = @"C:\Program Files\SeeTec\log";
 
-        //private static readonly string _serverLogsTempZip = seeTecInstallPath + @"\TempLogs\ServerLog.zip";
-        private static readonly string _serverLogsTempZip = @"C:\Program Files\SeeTec\TempLogs\ServerLog.zip";
+        private static readonly string _serverLogsTempZip = seeTecInstallPath + @"\TempLogs\ServerLog.zip";
+        //private static readonly string _serverLogsTempZip = @"C:\Program Files\SeeTec\TempLogs\ServerLog.zip";
 
-        //private static readonly string _serverLogsCopyTemp = seeTecInstallPath + @"\TempLogs\ServerLog";
-        private static readonly string _serverLogsCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ServerLog";
+        private static readonly string _serverLogsCopyTemp = seeTecInstallPath + @"\TempLogs\ServerLog";
+        //private static readonly string _serverLogsCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ServerLog";
 
         private static readonly string _serverLogsName = "Server logs";
 
-
+        // relative path for the client logs location
         private static readonly string _clientLogsPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\log");
         private static readonly string clientConfPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\conf");
 
-        private static readonly string _clientLogsConfTempZip = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf.zip";
-        //private static readonly string _clientLogsConfTempZip = seeTecInstallPath + @"\TempLogs\ClientLogsConf.zip";
+        private static readonly string _clientLogsConfTempZip = seeTecInstallPath + @"\TempLogs\ClientLogsConf.zip";
+        //private static readonly string _clientLogsConfTempZip = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf.zip";
 
-        private static readonly string clientLogCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf\ClientLogs";
-        //private static readonly string clientLogCopyTemp = seeTecInstallPath + @"\TempLogs\ClientLogsConf\ClientLogs";
+        private static readonly string clientLogCopyTemp = seeTecInstallPath + @"\TempLogs\ClientLogsConf\ClientLogs";
+        //private static readonly string clientLogCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf\ClientLogs";
 
-        private static readonly string clientConfCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf\ClientConf";
-        //private static readonly string clientConfCopyTemp = seeTecInstallPath + @"\TempLogs\ClientLogsConf\ClientConf";
+        private static readonly string clientConfCopyTemp = seeTecInstallPath + @"\TempLogs\ClientLogsConf\ClientConf";
+        //private static readonly string clientConfCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf\ClientConf";
 
-        private static readonly string _clientLogsConfTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf";
-        //private static readonly string _clientLogsConfTemp = seeTecInstallPath + @"\TempLogs\ClientLogsConf";
+        private static readonly string _clientLogsConfTemp = seeTecInstallPath + @"\TempLogs\ClientLogsConf";
+        //private static readonly string _clientLogsConfTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf";
 
         private static readonly string _clientLogsConfName = "Client logs and configuration";
 
-        private static readonly string logsZipPath = @"C:\Program Files\SeeTec\TempLogs";
-        //private static readonly string logsZipPath = seeTecInstallPath + @"\TempLogs";
+        private static readonly string logsZipPath = seeTecInstallPath + @"\TempLogs";
+        //private static readonly string logsZipPath = @"C:\Program Files\SeeTec\TempLogs";
 
-        private static readonly string _logsClientConfCopyTempZip = @"C:\Program Files\SeeTec\TempLogs\AllLog\ClientLogsConf.zip";
-        //private static readonly string _logsClientConfCopyTempZip = seeTecInstallPath + @"\TempLogs\AllLog\ClientLogsConf.zip";
+        private static readonly string _logsClientConfCopyTempZip = seeTecInstallPath + @"\TempLogs\AllLog\ClientLogsConf.zip";
+        //private static readonly string _logsClientConfCopyTempZip = @"C:\Program Files\SeeTec\TempLogs\AllLog\ClientLogsConf.zip";
 
-        private static readonly string _logsServerCopyTempZip = @"C:\Program Files\SeeTec\TempLogs\AllLog\ServerLog.zip";
-        //private static readonly string _logsServerCopyTempZip = seeTecInstallPath + @"\TempLogs\AllLog\ServerLog.zip";
+        private static readonly string _logsServerCopyTempZip = seeTecInstallPath + @"\TempLogs\AllLog\ServerLog.zip";
+        //private static readonly string _logsServerCopyTempZip = @"C:\Program Files\SeeTec\TempLogs\AllLog\ServerLog.zip";
 
-        private static readonly string _logsZipFolderPathZip = @"C:\Program Files\SeeTec\TempLogs\AllLog.zip";
-        //private static readonly string _logsZipFolderPathZip = seeTecInstallPath + @"\TempLogs\AllLog.zip";
+        private static readonly string _logsZipFolderPathZip = seeTecInstallPath + @"\TempLogs\AllLog.zip";
+        //private static readonly string _logsZipFolderPathZip = @"C:\Program Files\SeeTec\TempLogs\AllLog.zip";
 
-        private static readonly string _logsTemp = @"C:\Program Files\SeeTec\TempLogs\AllLog";
-        //private static readonly string _logsTemp = seeTecInstallPath + @"\TempLogs\AllLog";
+        private static readonly string _logsTemp = seeTecInstallPath + @"\TempLogs\AllLog";
+        //private static readonly string _logsTemp = @"C:\Program Files\SeeTec\TempLogs\AllLog";
 
         private static readonly string _logZipFolderName = "Server, client logs and configuration";
 
@@ -89,8 +90,8 @@ namespace Logs.ViewModels
         private static readonly string _logTextZipFolder = " zip folder";
         private static readonly string _logTextUploadFailed = "File upload Failed.\r\n Error Message: ";
         private static readonly string _logTextUploadSucceeded = " zip folder successfully uploaded to the SeeTec FTP server. \n Please inform support staff that the logs are uploaded to the FTP server";
-        private static readonly string _logTextUploadSuccess = " zip folder successfully uploaded";
-        private static readonly string _logTextNoInternet = "No internet connection available. FTP upload disabled";
+        private static readonly string _logTextUploadSuccess = " zip folder successfully uploaded to the SeeTec FTP server.";
+        private static readonly string _logTextNoInternet = "No internet connection available. FTP upload disabled.";
         private static readonly string _logTextFolderSize = "The log folder size is about ";
         private static readonly string _logTextFolderBePatientMB = " MB. \n Creating log zip folder may take some time. Please be patient.";
         private static readonly string _logTextFolderBePatientGB = " GB. \n Creating log zip folder may take some time. Please be patient.";
@@ -111,11 +112,11 @@ namespace Logs.ViewModels
 
         private static Visibility _tbProgressTextVisibility = Visibility.Hidden;
         private static Visibility _progressbarVisibility = Visibility.Hidden;
+        private static bool _isProgressBarIndeterminate = false;
+
+        // just a initial value for the ProgressBarMaximum. We could also set it to 1
         private static long _progressBarMaximum = 100;
         private static long _progressBarValue = 0;
-
-        // FileSystemWatcher variable. Watches whether a created zip file was deleted oder renamed
-        FileSystemWatcher watcher;
         #endregion
 
         #region Property members
@@ -160,6 +161,7 @@ namespace Logs.ViewModels
             get { return _isBtnClientFTPEnabled; }
             set
             {
+                // The Client FTP upload button will only enabled if the the client logs zip file exists and if we have an internet connection here
                 if (File.Exists(ClientLogsConfTempZip) && IsInternetConnectionAvailable)
                 {
                     _isBtnClientFTPEnabled = value;
@@ -176,7 +178,7 @@ namespace Logs.ViewModels
         {
             get { return _isBtnServerFTPEnabled; }
             set
-            {
+            {   // The Server FTP upload button will only enabled if the the server logs zip file exists and if we have an internet connection here
                 if (File.Exists(ServerLogsTempZip) && IsInternetConnectionAvailable)
                 {
                     _isBtnServerFTPEnabled = value;
@@ -194,6 +196,7 @@ namespace Logs.ViewModels
             get { return _isBtnUploadAllFTPEnabled; }
             set
             {
+                // The All logs FTP upload button will only enabled if the Client FTP upload button and Server FTP upload button are enabled
                 if (IsBtnClientFTPEnabled && IsBtnServerFTPEnabled && value == true)
                 {
                     _isBtnUploadAllFTPEnabled = value;
@@ -211,6 +214,7 @@ namespace Logs.ViewModels
             get { return _isBtnClientLogsConfEnabled; }
             set
             {
+                // Client logs button will only enabled if the client logs and conf directory exists in localappdata seetec
                 if (value == true && Directory.Exists(ClientLogsPath) && Directory.Exists(clientConfPath))
                 {
                     _isBtnClientLogsConfEnabled = value;
@@ -228,6 +232,7 @@ namespace Logs.ViewModels
             get { return _isBtnServerLogsEnabled; }
             set
             {
+                // Server logs button will only enabled if the server exits in the SeeTec install path. It might be that only a Client is installed
                 if (value == true && Directory.Exists(ServerLogsPath))
                 {
                     _isBtnServerLogsEnabled = value;
@@ -466,6 +471,16 @@ namespace Logs.ViewModels
             }
         }
 
+        public static bool IsProgressBarIndeterminate
+        {
+            get { return _isProgressBarIndeterminate; }
+            set
+            {
+                _isProgressBarIndeterminate = value;
+                RaiseStaticPropertyChanged();
+            }
+        }
+
         public static long ProgressBarMaximum
         {
             get { return _progressBarMaximum; }
@@ -529,6 +544,7 @@ namespace Logs.ViewModels
 
         public MainViewModel()
         {
+            // Relay commands for the buttons
             ExportClientLogsConfCommand = new RelayCommand(() => ExecuteExportClientLogsConfCommand());
             ExportServerLogsCommand = new RelayCommand(() => ExecuteExportServerLogsCommand());
             UploadClientFilesFTPCommand = new RelayCommand(() => ExecuteUploadClientFilesFTPCommand());
@@ -536,33 +552,20 @@ namespace Logs.ViewModels
             OpenLogsPathCommand = new RelayCommand(() => ExecuteOpenLogsPathCommand());
             UploadAllFilesFTPCommand = new RelayCommand(() => ExecuteUploadAllFilesFTPCommand());
 
-            if (!LogFunction.CheckInternetConnection())
-            {
-                IsInternetConnectionAvailable = false;
-                LogText += LogTextInfo + LogTextNoInternet;
-            }
+            // Check if internet connection is available at start. If not it will disable the ftp upload function
+            LogFunction.CheckInternetConnection();
+           
+            // Enable upload buttons at start if zip file already exists
+            UpdateFTPButtonsAfterDeleteZipFile();
 
-            // Enable upload buttons if zip file already exists
-            IsBtnClientFTPEnabled = true;
-            IsBtnServerFTPEnabled = true;
-            IsBtnUploadAllFTPEnabled = true;
+            // Enable create logs buttons at start if the log directorys exists
+            UpdateCreateLogsButtons();
 
-            // Enable create logs buttons if the log directorys exists
-            IsBtnClientLogsConfEnabled = true;
-            IsBtnServerLogsEnabled = true;
+            // Check if create client logs button and create server logs button are enabled. If not inform user that the not available logs cannot be created 
+            LogFunction.CheckLogsAvailabilty();
 
-            if (!IsBtnClientLogsConfEnabled)
-            {
-                LogFunction.LogsNotAvailable(ClientLogsConfName);
-            }
-            if (!IsBtnServerLogsEnabled)
-            {
-                LogFunction.LogsNotAvailable(ServerLogsName);
-            }
-
+            // Subscribe to an event which is fired when the event indicates that the associated process exited
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
-
-            FSWInitialize();
         }
 
         /// <summary>
@@ -579,7 +582,7 @@ namespace Logs.ViewModels
 
         /// <summary>
         /// Execute ExportServerLogsCommand
-        /// Starts the method to zip server logs with other thread
+        /// Starts the method to zip server logs with other thread 
         /// </summary>
         private void ExecuteExportServerLogsCommand()
         {
@@ -624,6 +627,7 @@ namespace Logs.ViewModels
 
         /// <summary>
         /// Execute OpenLogsPathCommand
+        /// Method to open the temp logs folder where the log zip folders are located
         /// </summary>
         private void ExecuteOpenLogsPathCommand()
         {
@@ -632,24 +636,24 @@ namespace Logs.ViewModels
 
         /// <summary>
         /// Method to zip server logs
-        /// First copy the server logs to a specified directory
-        /// Second zip the copied logs
-        /// At last enable create server logs button
+        /// First check the folder size of the server logs
+        /// Second set the IsUploadingAllLogs to false to activate zipping save progress
+        /// At last zip server logs to the temp logs folder
         /// </summary>
         private void StartCreatingServerLogs()
         {
             LogFunction.CheckFolderSize(ServerLogsPath);
-            LogFunction.CopyLogs(ServerLogsPath, ServerLogsCopyTemp, true);
             IsUploadingAllLogs = false;
-            LogFunction.CreateLogs(ServerLogsCopyTemp, ServerLogsTempZip, ServerLogsName);
+            LogFunction.CreateLogs(ServerLogsPath, ServerLogsTempZip, ServerLogsName);
         }
 
         /// <summary>
         /// Method to zip Client logs and conf
-        /// First copy the client logs to a specified directory
-        /// Second copy the client conf to a specified directory
-        /// Third zip the copied logs and conf
-        /// At last enable create client logs and conf button
+        /// First check the folder size of the client logs
+        /// Second copy the client logs to temp logs folder
+        /// Third copy the client conf to temp logs folder
+        /// Fourth set the IsUploadingAllLogs to false to activate zipping save progress
+        /// At last zip client logs and conf to the temp logs folder
         /// </summary>
         private void StartCreatingClientLogsConfLogs()
         {
@@ -662,39 +666,54 @@ namespace Logs.ViewModels
 
         /// <summary>
         /// Method to upload client files to the FTP server
+        /// First check the zip folder size of client logs
+        /// Second upload the client logs and conf zip to the seetec ftp server
+        /// At last update the create logs buttons
         /// </summary>
         private void StartUploadingClientFilesFTP()
         {
             LogFunction.CheckZipSize(ClientLogsConfTempZip);
             LogFunction.UploadLogsFTP(ClientLogsConfTempZip, TbClientLogsConfName);
 
-            UpdateCreateLogsButtonProperties();
+            UpdateCreateLogsButtons();
         }
 
         /// <summary>
         /// Method to upload server files to the FTP server
+        /// First check the zip folder size of server logs
+        /// Second upload the server logs zip to the seetec ftp server
+        /// At last update the create logs buttons
         /// </summary>
         private void StartUploadingServerFilesFTP()
         {
             LogFunction.CheckZipSize(ServerLogsTempZip);
             LogFunction.UploadLogsFTP(ServerLogsTempZip, TbServerLogsName);
 
-            UpdateCreateLogsButtonProperties();
+            UpdateCreateLogsButtons();
         }
 
         /// <summary>
         /// Method to upload all files to the FTP server
+        /// First activate the progress bar indeterminate mode. Because we dont use save progress for zipping all logs
+        /// Second set the IsUploadingAllLogs to true to deactivate zipping save progress
+        /// Third we copy the existing serverlogs and client logs zip to a all logs folder
+        /// Fourth we zip the all logs folder
+        /// Fifth stop indeterminate mode for the progress bar 
+        /// Sixth check the zip folder size of client logs
+        /// Seventh upload all logs zip to the seetec ftp server
+        /// At last update the create logs buttons
         /// </summary>
         private void StartUploadingAllFilesFTP()
         {
+            IsProgressBarIndeterminate = true;
             IsUploadingAllLogs = true;
             LogFunction.CopyClientServerZipFolder();
             LogFunction.CreateLogs(LogsTemp, LogsZipFolderPathZip, LogZipFolderName);
-
+            IsProgressBarIndeterminate = false;
             LogFunction.CheckZipSize(LogsZipFolderPathZip);
             LogFunction.UploadLogsFTP(LogsZipFolderPathZip, TbAllLogsName);
 
-            UpdateCreateLogsButtonProperties();
+            UpdateCreateLogsButtons();
         }
 
         #region Update properties members
@@ -713,14 +732,14 @@ namespace Logs.ViewModels
 
         public static void UpdatePropertiesCreateLogsAtEnd(string logZipName)
         {
-            TbProgressText = logZipName + "\n" + LogTextZipSuccess;
+            ProgressbarVisibility = Visibility.Hidden;
+            ProgressBarValue = 0;
+            TbProgressText = logZipName + LogTextZipSuccess;
             IsBtnServerFTPEnabled = true;
             IsBtnClientFTPEnabled = true;
             IsBtnUploadAllFTPEnabled = true;
             IsBtnServerLogsEnabled = true;
             IsBtnClientLogsConfEnabled = true;
-            ProgressbarVisibility = Visibility.Hidden;
-            ProgressBarValue = 0;
         }
 
         private void UpdatePropertiesUploadLogs(string progressText)
@@ -735,22 +754,22 @@ namespace Logs.ViewModels
             IsBtnUploadAllFTPEnabled = false;
         }
 
-        private void UpdateCreateLogsButtonProperties()
+        private void UpdateCreateLogsButtons()
         {
             IsBtnServerLogsEnabled = true;
             IsBtnClientLogsConfEnabled = true;
         }
 
-        public static void UpdateFTPUploadButtons(string logZipName)
+        public static void UpdatePropertiesFTPUpload(string logZipName)
         {
             ProgressbarVisibility = Visibility.Hidden;
-            TbProgressText = logZipName + "\n" + LogTextUploadSuccess;
+            TbProgressText = logZipName + LogTextUploadSuccess;
             IsBtnClientFTPEnabled = true;
             IsBtnServerFTPEnabled = true;
             IsBtnUploadAllFTPEnabled = true;
         }
 
-        private static void UpdateFTPButtonsAfterDeleteZipFile()
+        public static void UpdateFTPButtonsAfterDeleteZipFile()
         {
             IsBtnClientFTPEnabled = true;
             IsBtnServerFTPEnabled = true;
@@ -771,8 +790,9 @@ namespace Logs.ViewModels
 
         /// <summary>
         /// Method to delete copied temporary log folders and files before exiting application
+        /// It will also delete temporary files from the zipping process
         /// </summary>
-        private static void OnProcessExit(object sender, EventArgs e)
+        private void OnProcessExit(object sender, EventArgs e)
         {
             try
             {
@@ -800,50 +820,11 @@ namespace Logs.ViewModels
             {
 
             }
-        }
-
-        #region FileSystemWatcher Members
-        /// <summary>
-        /// Listens to the file system change notifications and raises events when a zip file in a directory, changes.
-        /// </summary>
-        private void FSWInitialize()
-        {
-            // If temp folder doesnt exist then we have to create the temp folder for the zip files 
-            if (!Directory.Exists(logsZipPath))
+            catch (FileNotFoundException)
             {
-                LogFunction.CreateTempLogsFolder(logsZipPath);
+
             }
 
-            if (Directory.Exists(logsZipPath))
-            {
-                // Create a new FileSystemWatcher and set its properties.
-                watcher = new FileSystemWatcher();
-
-                // Set path and filter. Only watch zip files
-                watcher.Path = logsZipPath;
-                watcher.Filter = "*.zip";
-
-                // Add event handlers.
-                watcher.Deleted += new FileSystemEventHandler(FSW_Deleted);
-                watcher.Renamed += new RenamedEventHandler(FSW_Renamed);
-
-                // Begin watching.
-                watcher.EnableRaisingEvents = true;
-            }
         }
-
-        // Define the event handlers.
-        void FSW_Renamed(object sender, RenamedEventArgs e)
-        {
-            // Specify what is done when a zip file is deleted.
-            UpdateFTPButtonsAfterDeleteZipFile();
-        }
-
-        void FSW_Deleted(object sender, FileSystemEventArgs e)
-        {
-            // Specify what is done when a zip file is renamed.
-            UpdateFTPButtonsAfterDeleteZipFile();
-        }
-        #endregion
     }
 }

@@ -28,7 +28,8 @@
             <RowDefinition Height="20" />
             <RowDefinition Height="100" />
             <RowDefinition Height="100" />
-            <RowDefinition Height="70" />
+            <RowDefinition Height="35" />
+            <RowDefinition Height="35" />
             <RowDefinition Height="250" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -42,7 +43,7 @@
         <Button Content="Server logs" Height="50" Width="90" Grid.Row="1" Grid.Column="5" Command="{Binding ExportServerLogsCommand}" IsEnabled="{Binding IsBtnServerLogsEnabled}"/>
         <Button Content="Client logs" Height="50" Width="90" Grid.Row="1" Grid.Column="0" Command="{Binding ExportClientLogsConfCommand}" IsEnabled="{Binding IsBtnClientLogsConfEnabled}"/>
         <Button Height="50" Width="90" Grid.Row="1" Grid.Column="2" Command="{Binding OpenLogsPathCommand}">
-            <TextBlock TextAlignment="Center">Open logs<LineBreak /> zip path</TextBlock>
+            <TextBlock TextAlignment="Center">Open logs<LineBreak /> zip folder</TextBlock>
         </Button>
 
         <StackPanel Grid.Row="2" Grid.Column="5">
@@ -70,12 +71,10 @@
             </Button>
         </StackPanel>
 
-        <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3">
-            <ProgressBar  IsIndeterminate="{Binding IsIndeterminate}" Minimum="0" Height="15"   Maximum="{Binding ProgressBarMaximum}" Value="{Binding ProgressBarValue}" Margin="5,10,5,2" Visibility="{Binding ProgressbarVisibility}" />
-            <TextBox Foreground="#d2d1d3" Width="210" TextAlignment="Center" Background="#4d535e" BorderThickness="0" Text="{Binding TbProgressText}" Visibility="{Binding TbProgressTextVisibility}"/>
-        </StackPanel>
+        <ProgressBar  IsIndeterminate="{Binding IsProgressBarIndeterminate}" Minimum="0" Height="15"   Maximum="{Binding ProgressBarMaximum}" Value="{Binding ProgressBarValue}" Visibility="{Binding ProgressbarVisibility}" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"/>
+        <TextBox Foreground="#d2d1d3" TextAlignment="Center" Background="#4d535e" BorderThickness="0" Text="{Binding TbProgressText}" Visibility="{Binding TbProgressTextVisibility}" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" />
 
-        <TextBox Background="White" Grid.Row="4" Grid.ColumnSpan="5" Text="{Binding LogText}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderThickness="2" FontSize="13" />
+        <TextBox Background="White" Grid.Row="5" Grid.ColumnSpan="5" Text="{Binding LogText}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderThickness="2" FontSize="13" Margin="0,5,0,0"/>
 
     </Grid>
 </Window>
