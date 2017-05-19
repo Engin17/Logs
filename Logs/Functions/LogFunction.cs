@@ -204,15 +204,15 @@ namespace Logs.Functions
                 byte[] buffer = new byte[8192];
                 int read = fs.Read(buffer, 0, buffer.Length);
 
-                long transfered = 0;
+                long transferred = 0;
                 MainViewModel.ProgressBarMaximum = fileInf.Length;
 
                 while (read > 0)
                 {
                     rs.Write(buffer, 0, read);
 
-                    transfered += read;
-                    MainViewModel.ProgressBarValue = transfered;
+                    transferred += read;
+                    MainViewModel.ProgressBarValue = transferred;
 
                     read = fs.Read(buffer, 0, buffer.Length);
                 }
@@ -254,7 +254,7 @@ namespace Logs.Functions
                 {
                     CreateTempLogsFolder(zipPath);
                 }
-                // Open log zip folder with task manager
+                // Open log zip folder with windows explorer
                 Process.Start(zipPath);
             }
             catch (Win32Exception ex)
@@ -263,6 +263,9 @@ namespace Logs.Functions
             }
         }
 
+        /// <summary>
+        /// Method to create the temp logs folder for the zip files
+        /// </summary>
         public static void CreateTempLogsFolder(string tempPath)
         {
             try
@@ -275,6 +278,9 @@ namespace Logs.Functions
             }
         }
 
+        /// <summary>
+        /// Method to copy created client and server zip to all logs folder
+        /// </summary>
         public static void CopyClientServerZipFolder()
         {
             if (!Directory.Exists(MainViewModel.LogsTemp))
@@ -297,11 +303,12 @@ namespace Logs.Functions
         }
 
         /// <summary>
-        /// Metho
+        /// Method which is called after uploading zip files to the seetec ftp server
+        /// First check if client, server or both logs are uploaded
+        /// Second check if upload is succeeded. If yes do something, if not set upload succeeded to true again
         /// </summary>
         private static void StartCleaning(string file)
         {
-
             if (file == MainViewModel.ServerLogsTempZip)
             {
                 if (MainViewModel.IsUploadSucceeded)
@@ -334,10 +341,13 @@ namespace Logs.Functions
                 }
                 MainViewModel.UpdatePropertiesFTPUpload(MainViewModel.LogZipFolderName); ;
             }
-            //MainViewModel.UpdatePropertiesFTPUpload("");
+
             MainViewModel.IsUploadSucceeded = true;
         }
 
+        /// <summary>
+        /// Method to delete files and folders after uploading
+        /// </summary>
         private static void DeleteFilesFoldersAfterUpload(string file, string folder)
         {
             try
@@ -386,6 +396,9 @@ namespace Logs.Functions
             }
         }
 
+        /// <summary>
+        /// Method to check how big the logs folder is
+        /// </summary>
         public static void CheckFolderSize(string logPath)
         {
             try
@@ -393,7 +406,6 @@ namespace Logs.Functions
                 long length = Directory.GetFiles(logPath, "*", SearchOption.AllDirectories).Sum(t => (new FileInfo(t).Length));
                 double size = Math.Round((length / 1024d) / 1024d, 2);
                 size = Math.Round(size, 2);
-
 
                 if (size > 1000d)
                 {
@@ -412,13 +424,19 @@ namespace Logs.Functions
             }
         }
 
+        /// <summary>
+        /// Method to check how big the logs zip file is
+        /// </summary>
         public static void CheckZipSize(string zipPath)
         {
             long length = new FileInfo(zipPath).Length;
             double size = Math.Round((length / 1204d) / 1024d, 2);
             MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextZipSize + size + MainViewModel.LogTextZipBePatientMB;
         }
-      
+        
+        /// <summary>
+        /// Methos to check if logs location is not available
+        /// </summary>
         public static void CheckLogsAvailabilty()
         {
             if (!MainViewModel.IsBtnClientLogsConfEnabled)
