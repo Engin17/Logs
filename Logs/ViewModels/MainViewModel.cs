@@ -114,7 +114,7 @@ namespace Logs.ViewModels
         private static Visibility _progressbarVisibility = Visibility.Hidden;
         private static bool _isProgressBarIndeterminate = false;
 
-        // just a initial value for the ProgressBarMaximum. We could also set it to 1
+        // just a initial value for the ProgressBarMaximum. We could also set it to 1. 
         private static long _progressBarMaximum = 100;
         private static long _progressBarValue = 0;
         #endregion
@@ -658,8 +658,10 @@ namespace Logs.ViewModels
         private void StartCreatingClientLogsConfLogs()
         {
             LogFunction.CheckFolderSize(ClientLogsPath);
+            IsProgressBarIndeterminate = true;
             LogFunction.CopyLogs(ClientLogsPath, clientLogCopyTemp, true);
             LogFunction.CopyLogs(clientConfPath, clientConfCopyTemp, true);
+            IsProgressBarIndeterminate = false;
             IsUploadingAllLogs = false;
             LogFunction.CreateLogs(ClientLogsConfTemp, ClientLogsConfTempZip, ClientLogsConfName);
         }

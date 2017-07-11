@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:Logs.ViewModels"
         xmlns:local="clr-namespace:Logs"
         mc:Ignorable="d"
-        Title="SeeTec Logs" Background="#4d535e" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Width="645" Height="620" Icon="Resources/SeeTec.ico" >
+        Title="Logs" Background="#4d535e" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Width="645" Height="620" >
 
     <Window.DataContext>
         <vm:MainViewModel />

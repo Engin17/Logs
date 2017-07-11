@@ -66,6 +66,10 @@ namespace Logs.Functions
             {
                 MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
             }
+            catch (IOException ex)
+            {
+                MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
+            }
         }
 
         /// <summary>
@@ -156,6 +160,10 @@ namespace Logs.Functions
             {
                 MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
                 MainViewModel.LogText += MainViewModel.LogTextError + MainViewModel.LogTextCouldNotCreate + MainViewModel.ClientLogsConfName.ToLower() + MainViewModel.LogTextZipFolder;
+            }
+            catch (IOException ex)
+            {
+                // TODO: If we have not enough space then we have to reset the update the progress bar and the buttons
             }
         }
 
@@ -382,7 +390,7 @@ namespace Logs.Functions
                 }
                 else
                 {
-                    if(reply.Status == IPStatus.Success)
+                    if (reply.Status == IPStatus.Success)
                     {
                         // Do nothing. Everything is ok
                     }
@@ -409,7 +417,7 @@ namespace Logs.Functions
 
                 if (size > 1000d)
                 {
-                    size = Math.Round(size / 1000d, 2);
+                    size = Math.Round(size / 1024d, 2);
 
                     MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextFolderSize + size + MainViewModel.LogTextFolderBePatientGB;
                 }
@@ -420,7 +428,7 @@ namespace Logs.Functions
             }
             catch (DirectoryNotFoundException ex)
             {
-                MainViewModel.LogText += "\n Not found";
+                MainViewModel.LogText += "\n " + ex + " Not found";
             }
         }
 
@@ -430,10 +438,10 @@ namespace Logs.Functions
         public static void CheckZipSize(string zipPath)
         {
             long length = new FileInfo(zipPath).Length;
-            double size = Math.Round((length / 1204d) / 1024d, 2);
+            double size = Math.Round((length / 1024d) / 1024d, 2);
             MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextZipSize + size + MainViewModel.LogTextZipBePatientMB;
         }
-        
+
         /// <summary>
         /// Methos to check if logs location is not available
         /// </summary>
