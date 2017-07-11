@@ -12,7 +12,7 @@ using System.Threading;
 namespace Logs.ViewModels
 {
     /// <summary>
-    /// This is our MainViewModel that is tied to the MainWindow
+    /// This is our MainViewModel that is tied to the MainWindow.
     /// </summary>
     public class MainViewModel
     {
