@@ -7,7 +7,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Threading;
-
+using Microsoft.Win32;
 
 namespace Logs.ViewModels
 {
@@ -17,17 +17,14 @@ namespace Logs.ViewModels
     public class MainViewModel
     {
         #region Member variables
-        // The executable of the tool will be located in SeeTec/tools/Logs. To find the server logs we go to folders up
-        private static string seeTecInstallPath = Directory.GetParent(Directory.GetParent(Environment.CurrentDirectory).ToString()).ToString();
+        private static string _seeTecInstallPath = "";
 
-        private static string _serverLogsPath = seeTecInstallPath + @"\log";
-        //private static readonly string _serverLogsPath = @"C:\Program Files\SeeTec\log";
+        private static string _serverLogsPath = "";
 
-        private static readonly string _serverLogsTempZip = seeTecInstallPath + @"\TempLogs\ServerLog.zip";
-        //private static readonly string _serverLogsTempZip = @"C:\Program Files\SeeTec\TempLogs\ServerLog.zip";
+        private static string _serverLogsTempZip = "";
 
-        private static readonly string _serverLogsCopyTemp = seeTecInstallPath + @"\TempLogs\ServerLog";
-        //private static readonly string _serverLogsCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ServerLog";
+        private static string _serverLogsCopyTemp = "";
+
 
         private static readonly string _serverLogsName = "Server logs";
 
@@ -35,34 +32,25 @@ namespace Logs.ViewModels
         private static readonly string _clientLogsPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\log");
         private static readonly string clientConfPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\conf");
 
-        private static readonly string _clientLogsConfTempZip = seeTecInstallPath + @"\TempLogs\ClientLogsConf.zip";
-        //private static readonly string _clientLogsConfTempZip = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf.zip";
+        private static string _clientLogsConfTempZip = "";
 
-        private static readonly string clientLogCopyTemp = seeTecInstallPath + @"\TempLogs\ClientLogsConf\ClientLogs";
-        //private static readonly string clientLogCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf\ClientLogs";
+        private static string _clientLogCopyTemp = "";
 
-        private static readonly string clientConfCopyTemp = seeTecInstallPath + @"\TempLogs\ClientLogsConf\ClientConf";
-        //private static readonly string clientConfCopyTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf\ClientConf";
+        private static string _clientConfCopyTemp = "";
 
-        private static readonly string _clientLogsConfTemp = seeTecInstallPath + @"\TempLogs\ClientLogsConf";
-        //private static readonly string _clientLogsConfTemp = @"C:\Program Files\SeeTec\TempLogs\ClientLogsConf";
+        private static string _clientLogsConfTemp = "";
 
         private static readonly string _clientLogsConfName = "Client logs and configuration";
 
-        private static readonly string logsZipPath = seeTecInstallPath + @"\TempLogs";
-        //private static readonly string logsZipPath = @"C:\Program Files\SeeTec\TempLogs";
+        private static string _logsZipPath = "";
 
-        private static readonly string _logsClientConfCopyTempZip = seeTecInstallPath + @"\TempLogs\AllLog\ClientLogsConf.zip";
-        //private static readonly string _logsClientConfCopyTempZip = @"C:\Program Files\SeeTec\TempLogs\AllLog\ClientLogsConf.zip";
+        private static string _logsClientConfCopyTempZip = "";
 
-        private static readonly string _logsServerCopyTempZip = seeTecInstallPath + @"\TempLogs\AllLog\ServerLog.zip";
-        //private static readonly string _logsServerCopyTempZip = @"C:\Program Files\SeeTec\TempLogs\AllLog\ServerLog.zip";
+        private static string _logsServerCopyTempZip = "";
 
-        private static readonly string _logsZipFolderPathZip = seeTecInstallPath + @"\TempLogs\AllLog.zip";
-        //private static readonly string _logsZipFolderPathZip = @"C:\Program Files\SeeTec\TempLogs\AllLog.zip";
+        private static string _logsZipFolderPathZip = "";
 
-        private static readonly string _logsTemp = seeTecInstallPath + @"\TempLogs\AllLog";
-        //private static readonly string _logsTemp = @"C:\Program Files\SeeTec\TempLogs\AllLog";
+        private static string _logsTemp = "";
 
         private static readonly string _logZipFolderName = "Server, client logs and configuration";
 
@@ -254,6 +242,15 @@ namespace Logs.ViewModels
             }
         }
 
+        public static string SeeTecInstallPath
+        {
+            get { return _seeTecInstallPath; }
+            set
+            {
+                _seeTecInstallPath = value;
+            }
+        }
+
         public static string ClientLogsPath
         {
             get { return _clientLogsPath; }
@@ -262,6 +259,10 @@ namespace Logs.ViewModels
         public static string ServerLogsPath
         {
             get { return _serverLogsPath; }
+            set
+            {
+                _serverLogsPath = value;
+            }
         }
 
         public static string ServerLogsName
@@ -282,41 +283,99 @@ namespace Logs.ViewModels
         public static string ServerLogsTempZip
         {
             get { return _serverLogsTempZip; }
+            set
+            {
+                _serverLogsTempZip = value;
+            }
         }
 
         public static string ServerLogsCopyTemp
         {
             get { return _serverLogsCopyTemp; }
+            set
+            {
+                _serverLogsCopyTemp = value;
+            }
         }
 
         public static string ClientLogsConfTempZip
         {
             get { return _clientLogsConfTempZip; }
+            set
+            {
+                _clientLogsConfTempZip = value;
+            }
+        }
+
+        public static string ClientLogCopyTemp
+        {
+            get { return _clientLogCopyTemp; }
+            set
+            {
+                _clientLogCopyTemp = value;
+            }
+        }
+        public static string ClientConfCopyTemp
+        {
+            get { return _clientConfCopyTemp; }
+            set
+            {
+                _clientConfCopyTemp = value;
+            }
         }
 
         public static string LogsZipFolderPathZip
         {
             get { return _logsZipFolderPathZip; }
+            set
+            {
+                _logsZipFolderPathZip = value;
+            }
+        }
+
+        public static string LogsZipPath
+        {
+            get { return _logsZipPath; }
+            set
+            {
+                _logsZipPath = value;
+            }
         }
 
         public static string LogsTemp
         {
             get { return _logsTemp; }
+            set
+            {
+                _logsTemp = value;
+            }
         }
 
         public static string ClientLogsConfTemp
         {
             get { return _clientLogsConfTemp; }
+            set
+            {
+                _clientLogsConfTemp = value;
+            }
         }
 
         public static string LogsClientConfCopyTempZip
         {
             get { return _logsClientConfCopyTempZip; }
+            set
+            {
+                _logsClientConfCopyTempZip = value;
+            }
         }
 
         public static string LogsServerCopyTempZip
         {
             get { return _logsServerCopyTempZip; }
+            set
+            {
+                _logsServerCopyTempZip = value;
+            }
         }
 
         #region Logs Properties
@@ -552,9 +611,12 @@ namespace Logs.ViewModels
             OpenLogsPathCommand = new RelayCommand(() => ExecuteOpenLogsPathCommand());
             UploadAllFilesFTPCommand = new RelayCommand(() => ExecuteUploadAllFilesFTPCommand());
 
+            // Find out where SeeTec is installed
+            FindSeeTecInstallPath();
+
             // Check if internet connection is available at start. If not it will disable the ftp upload function
             LogFunction.CheckInternetConnection();
-           
+
             // Enable upload buttons at start if zip file already exists
             UpdateFTPButtonsAfterDeleteZipFile();
 
@@ -631,7 +693,7 @@ namespace Logs.ViewModels
         /// </summary>
         private void ExecuteOpenLogsPathCommand()
         {
-            LogFunction.OpenLogsPath(logsZipPath);
+            LogFunction.OpenLogsPath(LogsZipPath);
         }
 
         /// <summary>
@@ -659,8 +721,8 @@ namespace Logs.ViewModels
         {
             LogFunction.CheckFolderSize(ClientLogsPath);
             IsProgressBarIndeterminate = true;
-            LogFunction.CopyLogs(ClientLogsPath, clientLogCopyTemp, true);
-            LogFunction.CopyLogs(clientConfPath, clientConfCopyTemp, true);
+            LogFunction.CopyLogs(ClientLogsPath, ClientLogCopyTemp, true);
+            LogFunction.CopyLogs(clientConfPath, ClientConfCopyTemp, true);
             IsProgressBarIndeterminate = false;
             IsUploadingAllLogs = false;
             LogFunction.CreateLogs(ClientLogsConfTemp, ClientLogsConfTempZip, ClientLogsConfName);
@@ -787,7 +849,59 @@ namespace Logs.ViewModels
         {
             EventHandler<PropertyChangedEventArgs> handler = StaticPropertyChanged;
             if (handler != null)
+            {
                 handler(null, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        /// <summary>
+        /// Method to find the SeeTec installation path
+        /// Search for the path in the registry --> CurrentUser --> RecentApps
+        /// </summary>
+        private static void FindSeeTecInstallPath()
+        {
+            string registry_key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Search\RecentApps";
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(registry_key))
+            {
+                foreach (string subkey_name in key.GetSubKeyNames())
+                {
+                    using (RegistryKey subkey = key.OpenSubKey(subkey_name))
+                    {
+                        foreach (string valueName in subkey.GetValueNames())
+                        {
+                            string application = "VMS_Client";
+                            string appPath = "AppPath";
+
+                            if (subkey.GetValue(valueName).ToString().Contains(application) && valueName == appPath)
+                            {
+                                // Set the SeeTec installation path
+                                SeeTecInstallPath = Directory.GetParent(Directory.GetParent(subkey.GetValue(valueName).ToString()).ToString()).ToString();
+                            }
+                        }
+                    }
+                }
+            }
+            // Set all needed paths after finding the installation path
+            SetAllPaths();
+        }
+
+        /// <summary>
+        /// Method to set all needed paths
+        /// </summary>
+        private static void SetAllPaths()
+        {
+            ServerLogsPath = SeeTecInstallPath + @"\log";
+            ServerLogsTempZip = SeeTecInstallPath + @"\TempLogs\ServerLog.zip";
+            ServerLogsCopyTemp = SeeTecInstallPath + @"\TempLogs\ServerLog";
+            ClientLogsConfTempZip = SeeTecInstallPath + @"\TempLogs\ClientLogsConf.zip";
+            ClientLogCopyTemp = SeeTecInstallPath + @"\TempLogs\ClientLogsConf\ClientLogs";
+            ClientConfCopyTemp = SeeTecInstallPath + @"\TempLogs\ClientLogsConf\ClientConf";
+            ClientLogsConfTemp = SeeTecInstallPath + @"\TempLogs\ClientLogsConf";
+            LogsZipPath = SeeTecInstallPath + @"\TempLogs";
+            LogsClientConfCopyTempZip = SeeTecInstallPath + @"\TempLogs\AllLog\ClientLogsConf.zip";
+            LogsServerCopyTempZip = SeeTecInstallPath + @"\TempLogs\AllLog\ServerLog.zip";
+            LogsZipFolderPathZip = SeeTecInstallPath + @"\TempLogs\AllLog.zip";
+            LogsTemp = SeeTecInstallPath + @"\TempLogs\AllLog";
         }
 
         /// <summary>
@@ -813,7 +927,7 @@ namespace Logs.ViewModels
                     Directory.Delete(LogsTemp, true);
                 }
 
-                foreach (string sFile in Directory.GetFiles(logsZipPath, "*.tmp"))
+                foreach (string sFile in Directory.GetFiles(LogsZipPath, "*.tmp"))
                 {
                     File.Delete(sFile);
                 }

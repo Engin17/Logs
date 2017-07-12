@@ -9,6 +9,7 @@ using System.Net.NetworkInformation;
 using System.Windows;
 using Ionic.Zip;
 
+
 namespace Logs.Functions
 {
     public class LogFunction
@@ -457,7 +458,6 @@ namespace Logs.Functions
                 MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextLogsNotAvailabe;
             }
         }
-
     }
 
 }
