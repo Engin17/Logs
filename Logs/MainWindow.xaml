@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:Logs.ViewModels"
         xmlns:local="clr-namespace:Logs"
         mc:Ignorable="d"
-        Title="Logs" Background="#4d535e" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Width="645" Height="620" >
+        Title="Logs" Background="#4d535e" WindowStartupLocation="CenterScreen"  ResizeMode="NoResize" SizeToContent="WidthAndHeight">
 
     <Window.DataContext>
         <vm:MainViewModel />
@@ -31,6 +31,7 @@
             <RowDefinition Height="35" />
             <RowDefinition Height="35" />
             <RowDefinition Height="250" />
+            <RowDefinition Height="50" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="180" />
