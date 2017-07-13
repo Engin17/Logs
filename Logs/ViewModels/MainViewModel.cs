@@ -93,12 +93,13 @@ namespace Logs.ViewModels
         private static readonly string progressTextUploadClientfiles = "Please wait... \nuploading client files to the FTP server";
         private static readonly string progressTextUploadServerfiles = "Please wait... \nuploading server files to the FTP server";
         private static readonly string progressTextUploadAllfiles = "Please wait... \nuploading all files to the FTP server";
+        private static readonly string progressTextFileNotExist = "Log zip file doesnt exist. Please create new logs";
 
         private static string _tbServerLogsName = "HD-";
         private static string _tbClientLogsConfName = "HD-";
         private static string _tbAllLogsName = "HD-";
 
-        private static Visibility _tbProgressTextVisibility = Visibility.Hidden;
+        private static Visibility _tbProgressTextVisibility = Visibility.Visible;
         private static Visibility _progressbarVisibility = Visibility.Hidden;
         private static bool _isProgressBarIndeterminate = false;
 
@@ -185,7 +186,7 @@ namespace Logs.ViewModels
             set
             {
                 // The All logs FTP upload button will only enabled if the Client FTP upload button and Server FTP upload button are enabled
-                if (IsBtnClientFTPEnabled && IsBtnServerFTPEnabled && value == true)
+                if (IsBtnClientFTPEnabled && IsBtnServerFTPEnabled && IsInternetConnectionAvailable && value == true)
                 {
                     _isBtnUploadAllFTPEnabled = value;
                 }
@@ -618,7 +619,7 @@ namespace Logs.ViewModels
             LogFunction.CheckInternetConnection();
 
             // Enable upload buttons at start if zip file already exists
-            UpdateFTPButtonsAfterDeleteZipFile();
+            UpdateFTPButtons();
 
             // Enable create logs buttons at start if the log directorys exists
             UpdateCreateLogsButtons();
@@ -659,10 +660,25 @@ namespace Logs.ViewModels
         /// </summary>
         private void ExecuteUploadClientFilesFTPCommand()
         {
-            UpdatePropertiesUploadLogs(progressTextUploadClientfiles);
 
-            Thread t = new Thread(new ThreadStart(StartUploadingClientFilesFTP));
-            t.Start();
+            LogFunction.CheckInternetConnection();
+
+            // Check if log zip folder and internet connection are available. 
+            // Yes: start upload
+            // No: Update upload buttons
+            if (File.Exists(ClientLogsConfTempZip) && IsInternetConnectionAvailable)
+            {
+                UpdatePropertiesUploadLogs(progressTextUploadClientfiles);
+
+                Thread t = new Thread(new ThreadStart(StartUploadingClientFilesFTP));
+                t.Start();
+            }
+            else
+            {
+                TbProgressText = progressTextFileNotExist;
+                LogText += LogTextError + progressTextFileNotExist;
+                UpdateFTPButtons();
+            }
         }
 
         /// <summary>
@@ -670,10 +686,24 @@ namespace Logs.ViewModels
         /// </summary>
         private void ExecuteUploadServerFilesFTPCommand()
         {
-            UpdatePropertiesUploadLogs(progressTextUploadServerfiles);
+            LogFunction.CheckInternetConnection();
 
-            Thread t = new Thread(new ThreadStart(StartUploadingServerFilesFTP));
-            t.Start();
+            // Check if log zip folder and internet connection are available. 
+            // Yes: start upload
+            // No: Update upload buttons
+            if (File.Exists(ServerLogsTempZip) && IsInternetConnectionAvailable)
+            {
+                UpdatePropertiesUploadLogs(progressTextUploadServerfiles);
+
+                Thread t = new Thread(new ThreadStart(StartUploadingServerFilesFTP));
+                t.Start();
+            }
+            else
+            {
+                TbProgressText = progressTextFileNotExist;
+                LogText += LogTextError + progressTextFileNotExist;
+                UpdateFTPButtons();
+            }
         }
 
         /// <summary>
@@ -681,10 +711,24 @@ namespace Logs.ViewModels
         /// </summary>
         private void ExecuteUploadAllFilesFTPCommand()
         {
-            UpdatePropertiesUploadLogs(progressTextUploadAllfiles);
+            LogFunction.CheckInternetConnection();
 
-            Thread t = new Thread(new ThreadStart(StartUploadingAllFilesFTP));
-            t.Start();
+            // Check if log zip folder and internet connection are available. 
+            // Yes: start upload
+            // No: Update upload buttons
+            if ((File.Exists(ClientLogsConfTempZip)) && (File.Exists(ServerLogsTempZip)) && IsInternetConnectionAvailable)
+            {
+                UpdatePropertiesUploadLogs(progressTextUploadAllfiles);
+
+                Thread t = new Thread(new ThreadStart(StartUploadingAllFilesFTP));
+                t.Start();
+            }
+            else
+            {
+                TbProgressText = progressTextFileNotExist;
+                LogText += LogTextError + progressTextFileNotExist;
+                UpdateFTPButtons();
+            }
         }
 
         /// <summary>
@@ -791,7 +835,6 @@ namespace Logs.ViewModels
             IsBtnClientLogsConfEnabled = false;
             ProgressbarVisibility = Visibility.Visible;
             TbProgressText = progressText;
-            TbProgressTextVisibility = Visibility.Visible;
         }
 
         public static void UpdatePropertiesCreateLogsAtEnd(string logZipName)
@@ -810,7 +853,6 @@ namespace Logs.ViewModels
         {
             ProgressbarVisibility = Visibility.Visible;
             TbProgressText = progressText;
-            TbProgressTextVisibility = Visibility.Visible;
             IsBtnServerLogsEnabled = false;
             IsBtnClientLogsConfEnabled = false;
             IsBtnClientFTPEnabled = false;
@@ -833,7 +875,7 @@ namespace Logs.ViewModels
             IsBtnUploadAllFTPEnabled = true;
         }
 
-        public static void UpdateFTPButtonsAfterDeleteZipFile()
+        public static void UpdateFTPButtons()
         {
             IsBtnClientFTPEnabled = true;
             IsBtnServerFTPEnabled = true;

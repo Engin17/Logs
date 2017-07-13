@@ -336,7 +336,7 @@ namespace Logs.Functions
                     DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
                     MainViewModel.UpdatePropertiesFTPUpload(MainViewModel.ClientLogsConfName);
                 }
-                MainViewModel.UpdateFTPButtonsAfterDeleteZipFile();
+                MainViewModel.UpdateFTPButtons();
             }
 
             else if (file == MainViewModel.LogsZipFolderPathZip)
@@ -402,6 +402,10 @@ namespace Logs.Functions
             {
                 MainViewModel.IsInternetConnectionAvailable = false;
                 MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextNoInternet;
+                MainViewModel.TbProgressText = MainViewModel.LogTextNoInternet;
+
+                // No internet connection. Disable FTP buttons
+                MainViewModel.UpdateFTPButtons();
             }
         }
 
