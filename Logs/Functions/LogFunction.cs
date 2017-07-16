@@ -387,25 +387,28 @@ namespace Logs.Functions
 
                 if (reply.Status == IPStatus.Success)
                 {
-                    // Do nothing. Everything is ok
+                    MainViewModel.IsInternetConnectionAvailable = true;
                 }
                 else
                 {
                     if (reply.Status == IPStatus.Success)
                     {
-                        // Do nothing. Everything is ok
+                        MainViewModel.IsInternetConnectionAvailable = true;
                     }
                 }
 
             }
             catch
             {
-                MainViewModel.IsInternetConnectionAvailable = false;
-                MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextNoInternet;
-                MainViewModel.TbProgressText = MainViewModel.LogTextNoInternet;
+                if (MainViewModel.IsInternetConnectionAvailable)
+                {
+                    MainViewModel.IsInternetConnectionAvailable = false;
+                    MainViewModel.LogText += MainViewModel.LogTextWarning + MainViewModel.LogTextNoInternet;
+                    MainViewModel.TbProgressText = MainViewModel.LogTextNoInternet;
 
-                // No internet connection. Disable FTP buttons
-                MainViewModel.UpdateFTPButtons();
+                    // No internet connection. Disable FTP buttons
+                    MainViewModel.UpdateFTPButtons();
+                }
             }
         }
 

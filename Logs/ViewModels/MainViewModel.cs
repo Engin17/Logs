@@ -69,9 +69,10 @@ namespace Logs.ViewModels
 
         private static bool _isInternetConnectionAvailable = true;
 
-        private static string _logText = "Welcome!!! \n";
-        private static readonly string _logTextError = "\n [" + DateTime.Now + "] ERROR: ";
-        private static readonly string _logTextInfo = "\n [" + DateTime.Now + "] INFO: ";
+        private static string _logText = "Collect and upload logs!!!";
+        private static readonly string _logTextError = "\n\n [" + DateTime.Now + "] ERROR: ";
+        private static readonly string _logTextInfo = "\n\n [" + DateTime.Now + "] INFO: ";
+        private static readonly string _logTextWarning = "\n\n [" + DateTime.Now + "] WARNING: ";
         private static readonly string _logTextZipSuccess = " zip folder successfully zipped \n ";
         private static readonly string _logTextZipLocation = " zip folder is under: \n ";
         private static readonly string _logTextCouldNotCreate = " Could not create ";
@@ -400,6 +401,11 @@ namespace Logs.ViewModels
             get { return _logTextInfo; }
         }
 
+        public static string LogTextWarning
+        {
+            get { return _logTextWarning; }
+        }
+
         public static string LogTextZipSuccess
         {
             get { return _logTextZipSuccess; }
@@ -641,6 +647,8 @@ namespace Logs.ViewModels
 
             Thread t = new Thread(new ThreadStart(StartCreatingClientLogsConfLogs));
             t.Start();
+
+            LogFunction.CheckInternetConnection();
         }
 
         /// <summary>
@@ -653,6 +661,8 @@ namespace Logs.ViewModels
 
             Thread t = new Thread(new ThreadStart(StartCreatingServerLogs));
             t.Start();
+
+            LogFunction.CheckInternetConnection();
         }
 
         /// <summary>
