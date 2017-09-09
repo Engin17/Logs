@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Threading;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 namespace Logs.ViewModels
 {
@@ -21,38 +22,38 @@ namespace Logs.ViewModels
 
         private static string _serverLogsPath = "";
 
-        private static string _serverLogsTempZip = "";
+        private static string _serverLogsTempZip = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\ServerLogs.zip");
 
-        private static string _serverLogsCopyTemp = "";
+        private static string _serverLogsCopyTemp = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\ServerLogs");
 
 
         private static readonly string _serverLogsName = "Server logs";
 
-        // relative path for the client logs location
         private static readonly string _clientLogsPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\log");
         private static readonly string clientConfPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\conf");
 
-        private static string _clientLogsConfTempZip = "";
+        private static string _clientLogsConfTempZip = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\ClientLogsConf.zip");
 
-        private static string _clientLogCopyTemp = "";
+        private static string _clientLogCopyTemp = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\ClientLogsConf\ClientLogs");
 
-        private static string _clientConfCopyTemp = "";
+        private static string _clientConfCopyTemp = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\ClientLogsConf\ClientConf");
 
-        private static string _clientLogsConfTemp = "";
+        private static string _clientLogsConfTemp = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\ClientLogsConf");
 
         private static readonly string _clientLogsConfName = "Client logs and configuration";
 
-        private static string _logsZipPath = "";
+        private static string _logsZipPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs");
 
-        private static string _logsClientConfCopyTempZip = "";
+        private static string _logsClientConfCopyTempZip = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\AllLog\ClientLogsConf.zip");
 
-        private static string _logsServerCopyTempZip = "";
+        private static string _logsServerCopyTempZip = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\AllLog\ServerLog.zip");
 
-        private static string _logsZipFolderPathZip = "";
+        private static string _logsZipFolderPathZip = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\AllLog\AllLog.zip");
 
-        private static string _logsTemp = "";
+        private static string _logsTemp = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\AllLog");
 
         private static readonly string _logZipFolderName = "Server, client logs and configuration";
+
 
         private static bool _isUploadSucceeded = true;
 
@@ -943,17 +944,6 @@ namespace Logs.ViewModels
         private static void SetAllPaths()
         {
             ServerLogsPath = SeeTecInstallPath + @"\log";
-            ServerLogsTempZip = SeeTecInstallPath + @"\TempLogs\ServerLog.zip";
-            ServerLogsCopyTemp = SeeTecInstallPath + @"\TempLogs\ServerLog";
-            ClientLogsConfTempZip = SeeTecInstallPath + @"\TempLogs\ClientLogsConf.zip";
-            ClientLogCopyTemp = SeeTecInstallPath + @"\TempLogs\ClientLogsConf\ClientLogs";
-            ClientConfCopyTemp = SeeTecInstallPath + @"\TempLogs\ClientLogsConf\ClientConf";
-            ClientLogsConfTemp = SeeTecInstallPath + @"\TempLogs\ClientLogsConf";
-            LogsZipPath = SeeTecInstallPath + @"\TempLogs";
-            LogsClientConfCopyTempZip = SeeTecInstallPath + @"\TempLogs\AllLog\ClientLogsConf.zip";
-            LogsServerCopyTempZip = SeeTecInstallPath + @"\TempLogs\AllLog\ServerLog.zip";
-            LogsZipFolderPathZip = SeeTecInstallPath + @"\TempLogs\AllLog.zip";
-            LogsTemp = SeeTecInstallPath + @"\TempLogs\AllLog";
         }
 
         /// <summary>
