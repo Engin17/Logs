@@ -8,7 +8,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Windows;
 using Ionic.Zip;
-
+using Microsoft.Win32;
 
 namespace Logs.Functions
 {
@@ -201,7 +201,13 @@ namespace Logs.Functions
                 FileInfo fileInf = new FileInfo(logPath);
                 string file = logPath;
                 string uploadFileName = new FileInfo(file).Name;
-                uploadFileName = logName + "_" + uploadFileName;
+
+                // If the file is 
+                if (logName != "")
+                {
+                    uploadFileName = logName + "_" + uploadFileName;
+                }
+  
                 string uploadUrl = "ftp://217.22.207.192/";
                 fs = new FileStream(file, FileMode.Open, FileAccess.Read);
                 string ftpUrl = string.Format("{0}/{1}", uploadUrl, uploadFileName);
@@ -234,6 +240,7 @@ namespace Logs.Functions
                 MainViewModel.IsUploadSucceeded = false;
                 MainViewModel.ProgressbarVisibility = Visibility.Hidden;
                 MainViewModel.TbProgressText = ex.Message;
+                MainViewModel.UpdateFTPButtons();
             }
             finally
             {
@@ -270,6 +277,25 @@ namespace Logs.Functions
             {
                 MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
             }
+        }
+
+        /// <summary>
+        /// Method to select the path of the custom zip file
+        /// </summary>
+        public static void SelectCustomFile()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Zip files|*.zip;*.rar";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                MainViewModel.SelectedCustomFilePath = openFileDialog.FileName;
+                MainViewModel.TbSelectedCustomFileName = " " + Path.GetFileName(MainViewModel.SelectedCustomFilePath);
+                MainViewModel.CustomZipFile = MainViewModel.SelectedCustomFilePath;
+                MainViewModel.IsBtnUploadCustomFileEnabled = true;
+                MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextCustomZipFileSelected + "\n" + MainViewModel.SelectedCustomFilePath;
+                MainViewModel.TbProgressText = MainViewModel.LogTextCustomZipFileSelected;
+            }
+            
         }
 
         /// <summary>
@@ -322,35 +348,43 @@ namespace Logs.Functions
             {
                 if (MainViewModel.IsUploadSucceeded)
                 {
-                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextUploadSucceeded;
+                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextZipFolder + MainViewModel.LogTextUploadSucceeded;
                     DeleteFilesFoldersAfterUpload(MainViewModel.ServerLogsTempZip, MainViewModel.ServerLogsCopyTemp);
-                }
-                MainViewModel.UpdatePropertiesFTPUpload(MainViewModel.ServerLogsName);
+                    MainViewModel.UpdatePropertiesFTPUpload(MainViewModel.ServerLogsName);
+                }             
             }
 
             else if (file == MainViewModel.ClientLogsConfTempZip)
             {
                 if (MainViewModel.IsUploadSucceeded)
                 {
-                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextUploadSucceeded;
+                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextZipFolder + MainViewModel.LogTextUploadSucceeded;
                     DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
                     MainViewModel.UpdatePropertiesFTPUpload(MainViewModel.ClientLogsConfName);
                 }
-                MainViewModel.UpdateFTPButtons();
             }
 
             else if (file == MainViewModel.LogsZipFolderPathZip)
             {
                 if (MainViewModel.IsUploadSucceeded)
                 {
-                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogZipFolderName + MainViewModel.LogTextUploadSucceeded;
+                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogZipFolderName + MainViewModel.LogTextZipFolder + MainViewModel.LogTextUploadSucceeded;
                     DeleteFilesFoldersAfterUpload(MainViewModel.ServerLogsTempZip, MainViewModel.ServerLogsCopyTemp);
                     DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
                     DeleteFilesFoldersAfterUpload(MainViewModel.LogsZipFolderPathZip, MainViewModel.LogsTemp);
+                    MainViewModel.UpdatePropertiesFTPUpload(MainViewModel.LogZipFolderName);
                 }
-                MainViewModel.UpdatePropertiesFTPUpload(MainViewModel.LogZipFolderName); ;
+                
             }
-
+            else if (file == MainViewModel.CustomZipFile)
+            {
+                if (MainViewModel.IsUploadSucceeded)
+                {
+                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextCustomFile + MainViewModel.LogTextUploadSucceeded;
+                    DeleteCustomZipFileAfterUpload(MainViewModel.CustomZipFile);
+                    MainViewModel.UpdatePropertiesFTPUpload(MainViewModel.LogTextCustomFile);
+                }           
+            }
             MainViewModel.IsUploadSucceeded = true;
         }
 
@@ -369,6 +403,21 @@ namespace Logs.Functions
                 //Do nothing. Not important
             }
             catch (DirectoryNotFoundException)
+            {
+                //Do nothing. Not important
+            }
+        }
+
+        /// <summary>
+        /// Method to delete custom zip files after uploading
+        /// </summary>
+        private static void DeleteCustomZipFileAfterUpload(string file)
+        {
+            try
+            {
+                File.Delete(file);
+            }
+            catch (FileNotFoundException)
             {
                 //Do nothing. Not important
             }

@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Threading;
 using Microsoft.Win32;
-using System.Diagnostics;
+
 
 namespace Logs.ViewModels
 {
@@ -67,6 +67,8 @@ namespace Logs.ViewModels
         private static bool _isBtnUploadAllFTPEnabled = false;
         private static bool _isBtnClientLogsConfEnabled = false;
         private static bool _isBtnServerLogsEnabled = false;
+        private static bool _isBtnSelectCustomFileEnabled = true;
+        private static bool _isBtnUploadCustomFileEnabled = false;
 
         private static bool _isInternetConnectionAvailable = true;
 
@@ -79,8 +81,8 @@ namespace Logs.ViewModels
         private static readonly string _logTextCouldNotCreate = " Could not create ";
         private static readonly string _logTextZipFolder = " zip folder";
         private static readonly string _logTextUploadFailed = "File upload Failed.\r\n Error Message: ";
-        private static readonly string _logTextUploadSucceeded = " zip folder successfully uploaded to the SeeTec FTP server. \n Please inform support staff that the logs are uploaded to the FTP server";
-        private static readonly string _logTextUploadSuccess = " zip folder successfully uploaded to the SeeTec FTP server.";
+        private static readonly string _logTextUploadSucceeded = " successfully uploaded to the SeeTec FTP server. \n Please inform support staff that the logs are uploaded to the FTP server";
+        private static readonly string _logTextUploadSuccess = " successfully uploaded to the SeeTec FTP server.";
         private static readonly string _logTextNoInternet = "No internet connection available. FTP upload disabled.";
         private static readonly string _logTextFolderSize = "The log folder size is about ";
         private static readonly string _logTextFolderBePatientMB = " MB. \n Creating log zip folder may take some time. Please be patient.";
@@ -88,6 +90,9 @@ namespace Logs.ViewModels
         private static readonly string _logTextZipSize = "The zip folder size is about ";
         private static readonly string _logTextZipBePatientMB = " MB. \n Depending on the internet speed and the size of the zip folder the upload may take some time. \n Please be patient and wait until the logs are uploaded to the FTP server";
         private static readonly string _logTextLogsNotAvailabe = " are not available. Logs zip folder cannot be created.";
+
+        private static readonly string _logTextCustomZipFileSelected = "Custom Zip file selected.";
+        private static readonly string _logTextCustomFile = "Custom Zip file";
 
         private static string _tbProgressText = "";
         private static readonly string progressTextCreateClientfiles = "Please wait... \ncreating client files zip folder";
@@ -108,6 +113,11 @@ namespace Logs.ViewModels
         // just a initial value for the ProgressBarMaximum. We could also set it to 1. 
         private static long _progressBarMaximum = 100;
         private static long _progressBarValue = 0;
+
+        private static string _selectedCustomFilePath = "";
+        private static string _tbSelectedCustomFileName = "";
+        private static string _customZipFile = "";
+        private static readonly string progressTextUploadCustomFile = "Please wait... \nuploading custom files to the FTP server";
         #endregion
 
         #region Property members
@@ -147,6 +157,7 @@ namespace Logs.ViewModels
             }
         }
 
+        #region Button Properties
         public static bool IsBtnClientFTPEnabled
         {
             get { return _isBtnClientFTPEnabled; }
@@ -235,6 +246,36 @@ namespace Logs.ViewModels
                 RaiseStaticPropertyChanged();
             }
         }
+
+        public static bool IsBtnSelectCustomFileEnabled
+        {
+            get { return _isBtnSelectCustomFileEnabled; }
+            set
+            {
+                _isBtnSelectCustomFileEnabled = value;
+                RaiseStaticPropertyChanged();
+            }
+        }
+
+        public static bool IsBtnUploadCustomFileEnabled
+        {
+            get { return _isBtnUploadCustomFileEnabled; }
+            set
+            {
+                // Upload custom button will only enabled if a zip file is selected and available
+                if (File.Exists(CustomZipFile) && IsInternetConnectionAvailable)
+                {
+                    _isBtnUploadCustomFileEnabled = value;
+                }
+                else
+                {
+                    _isBtnUploadCustomFileEnabled = false;
+                }
+                RaiseStaticPropertyChanged();
+            }
+        }
+
+        #endregion
 
         public static bool IsInternetConnectionAvailable
         {
@@ -476,6 +517,16 @@ namespace Logs.ViewModels
         {
             get { return _logTextLogsNotAvailabe; }
         }
+
+        public static string LogTextCustomZipFileSelected
+        {
+            get { return _logTextCustomZipFileSelected; }
+        }
+
+        public static string LogTextCustomFile
+        {
+            get { return _logTextCustomFile; }
+        }
         #endregion
 
         public static string TbServerLogsName
@@ -537,6 +588,30 @@ namespace Logs.ViewModels
                 RaiseStaticPropertyChanged();
             }
         }
+
+        #region Custom Zip file properties
+        public static string SelectedCustomFilePath
+        {
+            get { return _selectedCustomFilePath; }
+            set { _selectedCustomFilePath = value; }
+        }
+
+        public static string TbSelectedCustomFileName
+        {
+            get { return _tbSelectedCustomFileName; }
+            set
+            {
+                _tbSelectedCustomFileName = value;
+                RaiseStaticPropertyChanged();
+            }
+        }
+
+        public static string CustomZipFile
+        {
+            get { return _customZipFile; }
+            set { _customZipFile = value; }
+        }
+        #endregion
 
         public static bool IsProgressBarIndeterminate
         {
@@ -604,9 +679,21 @@ namespace Logs.ViewModels
 
         /// <summary>
         /// Simple property to hold the 'OpenLogsPathCommand' - when executed
-        /// it will open the created logs zip folder path
+        /// it will upload all files to the FTP server
         /// </summary>
         public ICommand UploadAllFilesFTPCommand { get; private set; }
+
+        /// <summary>
+        /// Simple property to hold the 'SelectCustomFileCommand' - when executed
+        /// it will select the custom zip file
+        /// </summary>
+        public ICommand SelectCustomFileCommand { get; private set; }
+
+        /// <summary>
+        /// Simple property to hold the 'UploadCustomFileCommand' - when executed
+        /// it will upload selcted custom file to the FTP server
+        /// </summary>
+        public ICommand UploadCustomFileCommand { get; private set; }
         #endregion
 
         public MainViewModel()
@@ -618,6 +705,8 @@ namespace Logs.ViewModels
             UploadServerFilesFTPCommand = new RelayCommand(() => ExecuteUploadServerFilesFTPCommand());
             OpenLogsPathCommand = new RelayCommand(() => ExecuteOpenLogsPathCommand());
             UploadAllFilesFTPCommand = new RelayCommand(() => ExecuteUploadAllFilesFTPCommand());
+            SelectCustomFileCommand = new RelayCommand(() => ExecuteSelectCustomFileCommand());
+            UploadCustomFileCommand = new RelayCommand(() => ExecuteUploadCustomFileCommand());
 
             // Find out where SeeTec is installed
             FindSeeTecInstallPath();
@@ -629,7 +718,7 @@ namespace Logs.ViewModels
             UpdateFTPButtons();
 
             // Enable create logs buttons at start if the log directorys exists
-            UpdateCreateLogsButtons();
+            UpdateCreateLogsAndSelectButtons();
 
             // Check if create client logs button and create server logs button are enabled. If not inform user that the not available logs cannot be created 
             LogFunction.CheckLogsAvailabilty();
@@ -752,6 +841,41 @@ namespace Logs.ViewModels
         }
 
         /// <summary>
+        /// Execute SelectCustomFileCommand
+        /// Method to select the custom file for the upload
+        /// </summary>
+        private void ExecuteSelectCustomFileCommand()
+        {
+            LogFunction.SelectCustomFile();
+        }
+
+        /// <summary>
+        /// Execute UploadCustomFileCommand
+        /// Method to upload selected custom file to the FTP server
+        /// </summary>
+        private void ExecuteUploadCustomFileCommand()
+        {
+            LogFunction.CheckInternetConnection();
+
+            // Check if log zip folder and internet connection are available. 
+            // Yes: start upload
+            // No: Update upload buttons
+            if (File.Exists(CustomZipFile) && IsInternetConnectionAvailable)
+            {
+                UpdatePropertiesUploadLogs(progressTextUploadCustomFile);
+
+                Thread t = new Thread(new ThreadStart(StartUploadingCustomFilesFTP));
+                t.Start();
+            }
+            else
+            {
+                TbProgressText = progressTextFileNotExist;
+                LogText += LogTextError + progressTextFileNotExist;
+                UpdateFTPButtons();
+            }
+        }
+
+        /// <summary>
         /// Method to zip server logs
         /// First check the folder size of the server logs
         /// Second set the IsUploadingAllLogs to false to activate zipping save progress
@@ -794,7 +918,7 @@ namespace Logs.ViewModels
             LogFunction.CheckZipSize(ClientLogsConfTempZip);
             LogFunction.UploadLogsFTP(ClientLogsConfTempZip, TbClientLogsConfName);
 
-            UpdateCreateLogsButtons();
+            UpdateCreateLogsAndSelectButtons();
         }
 
         /// <summary>
@@ -808,7 +932,7 @@ namespace Logs.ViewModels
             LogFunction.CheckZipSize(ServerLogsTempZip);
             LogFunction.UploadLogsFTP(ServerLogsTempZip, TbServerLogsName);
 
-            UpdateCreateLogsButtons();
+            UpdateCreateLogsAndSelectButtons();
         }
 
         /// <summary>
@@ -832,7 +956,21 @@ namespace Logs.ViewModels
             LogFunction.CheckZipSize(LogsZipFolderPathZip);
             LogFunction.UploadLogsFTP(LogsZipFolderPathZip, TbAllLogsName);
 
-            UpdateCreateLogsButtons();
+            UpdateCreateLogsAndSelectButtons();
+        }
+
+        /// <summary>
+        /// Method to upload custom files to the FTP server
+        /// First check the zip folder size of custom ZIP file
+        /// Second upload the ZIP file to the seetec ftp server
+        /// At last update the create logs buttons
+        /// </summary>
+        private void StartUploadingCustomFilesFTP()
+        {
+            LogFunction.CheckZipSize(CustomZipFile);
+            LogFunction.UploadLogsFTP(CustomZipFile, "");
+
+            UpdateCreateLogsAndSelectButtons();
         }
 
         #region Update properties members
@@ -844,6 +982,7 @@ namespace Logs.ViewModels
             IsBtnUploadAllFTPEnabled = false;
             IsBtnServerLogsEnabled = false;
             IsBtnClientLogsConfEnabled = false;
+            IsBtnSelectCustomFileEnabled = false;
             ProgressbarVisibility = Visibility.Visible;
             TbProgressText = progressText;
         }
@@ -858,6 +997,7 @@ namespace Logs.ViewModels
             IsBtnUploadAllFTPEnabled = true;
             IsBtnServerLogsEnabled = true;
             IsBtnClientLogsConfEnabled = true;
+            IsBtnSelectCustomFileEnabled = true;
         }
 
         private void UpdatePropertiesUploadLogs(string progressText)
@@ -869,12 +1009,15 @@ namespace Logs.ViewModels
             IsBtnClientFTPEnabled = false;
             IsBtnServerFTPEnabled = false;
             IsBtnUploadAllFTPEnabled = false;
+            IsBtnSelectCustomFileEnabled = false;
+            IsBtnUploadCustomFileEnabled = false;
         }
 
-        private void UpdateCreateLogsButtons()
+        private void UpdateCreateLogsAndSelectButtons()
         {
             IsBtnServerLogsEnabled = true;
             IsBtnClientLogsConfEnabled = true;
+            IsBtnSelectCustomFileEnabled = true;
         }
 
         public static void UpdatePropertiesFTPUpload(string logZipName)
@@ -884,6 +1027,8 @@ namespace Logs.ViewModels
             IsBtnClientFTPEnabled = true;
             IsBtnServerFTPEnabled = true;
             IsBtnUploadAllFTPEnabled = true;
+            TbSelectedCustomFileName = "";
+            IsBtnUploadCustomFileEnabled = true;
         }
 
         public static void UpdateFTPButtons()
@@ -891,6 +1036,7 @@ namespace Logs.ViewModels
             IsBtnClientFTPEnabled = true;
             IsBtnServerFTPEnabled = true;
             IsBtnUploadAllFTPEnabled = true;
+            IsBtnUploadCustomFileEnabled = true;
         }
         #endregion
 

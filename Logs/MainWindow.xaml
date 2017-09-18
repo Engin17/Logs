@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:Logs.ViewModels"
         xmlns:local="clr-namespace:Logs"
         mc:Ignorable="d"
-        Title="Logs" Background="#4d535e" WindowStartupLocation="CenterScreen"  ResizeMode="NoResize" SizeToContent="WidthAndHeight" Icon="Resources\eye.ico">
+        Title="Logs" Background="#4d535e" WindowStartupLocation="CenterScreen"  ResizeMode="NoResize" SizeToContent="WidthAndHeight" Icon="Resources\logs.ico">
 
     <Window.DataContext>
         <vm:MainViewModel />
@@ -32,19 +32,21 @@
             <RowDefinition Height="35" />
             <RowDefinition Height="35" />
             <RowDefinition Height="250" />
-            <RowDefinition Height="50" />
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20" />
             <ColumnDefinition Width="210" />
             <ColumnDefinition Width="50" />
             <ColumnDefinition Width="170" />
             <ColumnDefinition Width="50" />
             <ColumnDefinition Width="210" />
+            <ColumnDefinition Width="20" />
         </Grid.ColumnDefinitions>
 
         <Button Content="Server logs" Height="50" Width="100" Grid.Row="1" Grid.Column="5" Command="{Binding ExportServerLogsCommand}" IsEnabled="{Binding IsBtnServerLogsEnabled}"/>
-        <Button Content="Client logs" Height="50" Width="100" Grid.Row="1" Grid.Column="0" Command="{Binding ExportClientLogsConfCommand}" IsEnabled="{Binding IsBtnClientLogsConfEnabled}"/>
-        <Button Height="50" Width="100" Grid.Row="1" Grid.Column="2" Command="{Binding OpenLogsPathCommand}">
+        <Button Content="Client logs" Height="50" Width="100" Grid.Row="1" Grid.Column="1" Command="{Binding ExportClientLogsConfCommand}" IsEnabled="{Binding IsBtnClientLogsConfEnabled}"/>
+        <Button Height="50" Width="100" Grid.Row="1" Grid.Column="3" Command="{Binding OpenLogsPathCommand}">
             <TextBlock TextAlignment="Center">Open logs<LineBreak /> zip folder</TextBlock>
         </Button>
 
@@ -56,7 +58,7 @@
             </Button>
         </StackPanel>
 
-        <StackPanel Grid.Row="2" Grid.Column="0">
+        <StackPanel Grid.Row="2" Grid.Column="1">
             <TextBox Height="20"  Width="100" Margin="5" IsEnabled="{Binding ElementName=BtnClientFTP, Path=IsEnabled}" Text="{Binding TbClientLogsConfName}"/>
 
 
@@ -65,7 +67,7 @@
             </Button>
         </StackPanel>
 
-        <StackPanel Grid.Row="2" Grid.Column="2">
+        <StackPanel Grid.Row="2" Grid.Column="3">
             <TextBox Height="20"  Width="100" Margin="5" IsEnabled="{Binding ElementName=BtnAllFTP, Path=IsEnabled}" Text="{Binding TbAllLogsName}"/>
 
             <Button Name="BtnAllFTP" Height="50" Width="100" IsEnabled="{Binding IsBtnUploadAllFTPEnabled}" Command="{Binding UploadAllFilesFTPCommand}">
@@ -73,14 +75,14 @@
             </Button>
         </StackPanel>
 
-        <Button Content="Select custom zip folder" Height="40" Width="150" Grid.Row="3" Grid.Column="0"/>
-        <TextBox IsEnabled="False" Height="40" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"/>
-        <Button Content="Upload custom zip folder" Height="40" Width="150" Grid.Row="3" Grid.Column="4"/>
+        <Button Content="Select custom zip file" Height="40" Width="150" Grid.Row="3" Grid.Column="1" Command="{Binding SelectCustomFileCommand}" IsEnabled="{Binding IsBtnSelectCustomFileEnabled}"/>
+        <TextBox VerticalContentAlignment="Center" IsEnabled="False" Height="40" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding TbSelectedCustomFileName}"/>
+        <Button Content="Upload custom zip file" Height="40" Width="150" Grid.Row="3" Grid.Column="5" Command="{Binding UploadCustomFileCommand}" IsEnabled="{Binding IsBtnUploadCustomFileEnabled}"/>
 
-        <ProgressBar  IsIndeterminate="{Binding IsProgressBarIndeterminate}" Minimum="0" Height="15"   Maximum="{Binding ProgressBarMaximum}" Value="{Binding ProgressBarValue}" Visibility="{Binding ProgressbarVisibility}" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3"/>
-        <TextBox Foreground="#d2d1d3" TextAlignment="Center" Background="#4d535e" BorderThickness="0" Text="{Binding TbProgressText}" Visibility="{Binding TbProgressTextVisibility}" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5" />
+        <ProgressBar  IsIndeterminate="{Binding IsProgressBarIndeterminate}" Minimum="0" Height="15"   Maximum="{Binding ProgressBarMaximum}" Value="{Binding ProgressBarValue}" Visibility="{Binding ProgressbarVisibility}" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3"/>
+        <TextBox Foreground="#d2d1d3" TextAlignment="Center" Background="#4d535e" BorderThickness="0" Text="{Binding TbProgressText}" Visibility="{Binding TbProgressTextVisibility}" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="5" />
 
-        <TextBox Background="White" Grid.Row="6" Grid.ColumnSpan="5" Text="{Binding LogText}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderThickness="2" FontSize="13" Margin="0,5,0,0"/>
+        <TextBox Background="White" Grid.Row="6" Grid.ColumnSpan="7" Text="{Binding LogText}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderThickness="2" FontSize="13" Margin="0,5,0,0"/>
 
     </Grid>
 </Window>
