@@ -46,9 +46,9 @@ namespace Logs.ViewModels
 
         private static string _logsClientConfCopyTempZip = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\AllLog\ClientLogsConf.zip");
 
-        private static string _logsServerCopyTempZip = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\AllLog\ServerLog.zip");
+        private static string _logsServerCopyTempZip = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\AllLog\ServerLogs.zip");
 
-        private static string _logsZipFolderPathZip = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\AllLog\AllLog.zip");
+        private static string _logsZipFolderPathZip = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\AllLog\AllLogs.zip");
 
         private static string _logsTemp = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\AppData\Local\SeeTec\Templogs\AllLog");
 
@@ -76,29 +76,29 @@ namespace Logs.ViewModels
         private static readonly string _logTextError = "\n\n [" + DateTime.Now + "] ERROR: ";
         private static readonly string _logTextInfo = "\n\n [" + DateTime.Now + "] INFO: ";
         private static readonly string _logTextWarning = "\n\n [" + DateTime.Now + "] WARNING: ";
-        private static readonly string _logTextZipSuccess = " zip folder successfully zipped \n ";
-        private static readonly string _logTextZipLocation = " zip folder is under: \n ";
+        private static readonly string _logTextZipSuccess = " log folder successfully zipped \n ";
+        private static readonly string _logTextZipLocation = " log folder is under: \n ";
         private static readonly string _logTextCouldNotCreate = " Could not create ";
-        private static readonly string _logTextZipFolder = " zip folder";
+        private static readonly string _logTextZipFolder = " zip file";
         private static readonly string _logTextUploadFailed = "File upload Failed.\r\n Error Message: ";
-        private static readonly string _logTextUploadSucceeded = " successfully uploaded to the SeeTec FTP server. \n Please inform support staff that the logs are uploaded to the FTP server";
-        private static readonly string _logTextUploadSuccess = " successfully uploaded to the SeeTec FTP server.";
+        private static readonly string _logTextUploadSucceeded = " file successfully uploaded to the SeeTec FTP server. \n Please inform support staff that the logs are uploaded to the FTP server";
+        private static readonly string _logTextUploadSuccess = " file successfully uploaded to the SeeTec FTP server.";
         private static readonly string _logTextNoInternet = "No internet connection available. FTP upload disabled.";
         private static readonly string _logTextFolderSize = "The log folder size is about ";
-        private static readonly string _logTextFolderBePatientMB = " MB. \n Creating log zip folder may take some time. Please be patient.";
-        private static readonly string _logTextFolderBePatientGB = " GB. \n Creating log zip folder may take some time. Please be patient.";
+        private static readonly string _logTextFolderBePatientMB = " MB. \n Creating log zip file may take some time. Please be patient.";
+        private static readonly string _logTextFolderBePatientGB = " GB. \n Creating log zip file may take some time. Please be patient.";
         private static readonly string _logTextZipSize = "The zip folder size is about ";
-        private static readonly string _logTextZipBePatientMB = " MB. \n Depending on the internet speed and the size of the zip folder the upload may take some time. \n Please be patient and wait until the logs are uploaded to the FTP server";
-        private static readonly string _logTextLogsNotAvailabe = " are not available. Logs zip folder cannot be created.";
+        private static readonly string _logTextZipBePatientMB = " MB. \n Depending on the internet speed and the size of the zip file the upload may take some time. \n Please be patient and wait until the file is uploaded to the FTP server";
+        private static readonly string _logTextLogsNotAvailabe = " are not available. Logs zip file cannot be created.";
 
-        private static readonly string _logTextCustomZipFileSelected = "Custom Zip file selected.";
-        private static readonly string _logTextCustomFile = "Custom Zip file";
+        private static readonly string _logTextCustomZipFileSelected = "Custom zip file selected.";
+        private static readonly string _logTextCustomFile = "Custom zip";
 
         private static string _tbProgressText = "";
-        private static readonly string progressTextCreateClientfiles = "Please wait... \ncreating client files zip folder";
-        private static readonly string progressTextCreateServerfiles = "Please wait... \ncreating server files zip folder";
-        private static readonly string progressTextUploadClientfiles = "Please wait... \nuploading client files to the FTP server";
-        private static readonly string progressTextUploadServerfiles = "Please wait... \nuploading server files to the FTP server";
+        private static readonly string progressTextCreateClientfiles = "Please wait... \ncreating client zip file";
+        private static readonly string progressTextCreateServerfiles = "Please wait... \ncreating server zip file";
+        private static readonly string progressTextUploadClientfiles = "Please wait... \nuploading client file to the FTP server";
+        private static readonly string progressTextUploadServerfiles = "Please wait... \nuploading server file to the FTP server";
         private static readonly string progressTextUploadAllfiles = "Please wait... \nuploading all files to the FTP server";
         private static readonly string progressTextFileNotExist = "Log zip file doesnt exist. Please create new logs";
 
@@ -110,14 +110,15 @@ namespace Logs.ViewModels
         private static Visibility _progressbarVisibility = Visibility.Hidden;
         private static bool _isProgressBarIndeterminate = false;
 
-        // just a initial value for the ProgressBarMaximum. We could also set it to 1. 
+        // Just a initial value for the ProgressBarMaximum. We could also set it to 1. 
         private static long _progressBarMaximum = 100;
         private static long _progressBarValue = 0;
 
         private static string _selectedCustomFilePath = "";
         private static string _tbSelectedCustomFileName = "";
         private static string _customZipFile = "";
-        private static readonly string progressTextUploadCustomFile = "Please wait... \nuploading custom files to the FTP server";
+        private static readonly string progressTextUploadCustomFile = "Please wait... \nuploading custom file to the FTP server";
+        private static bool _isUploadingCustomFile = false;
         #endregion
 
         #region Property members
@@ -642,6 +643,12 @@ namespace Logs.ViewModels
                 RaiseStaticPropertyChanged();
             }
         }
+
+        public static bool IsUploadingCustomFile
+        {
+            get { return _isUploadingCustomFile; }
+            set { _isUploadingCustomFile = value; }
+        }
         #endregion
 
         #region ICommand properties
@@ -775,8 +782,14 @@ namespace Logs.ViewModels
             }
             else
             {
-                TbProgressText = progressTextFileNotExist;
-                LogText += LogTextError + progressTextFileNotExist;
+                // Check if internet connection is available
+                // Yes: Inform user that there are no logs to upload
+                // No: Inform Customer that there is no internet connection
+                if (IsInternetConnectionAvailable)
+                {
+                    TbProgressText = progressTextFileNotExist;
+                    LogText += LogTextError + progressTextFileNotExist;
+                }
                 UpdateFTPButtons();
             }
         }
@@ -800,8 +813,14 @@ namespace Logs.ViewModels
             }
             else
             {
-                TbProgressText = progressTextFileNotExist;
-                LogText += LogTextError + progressTextFileNotExist;
+                // Check if internet connection is available
+                // Yes: Inform user that there are no logs to upload
+                // No: Inform Customer that there is no internet connection
+                if (IsInternetConnectionAvailable)
+                {
+                    TbProgressText = progressTextFileNotExist;
+                    LogText += LogTextError + progressTextFileNotExist;
+                }
                 UpdateFTPButtons();
             }
         }
@@ -825,8 +844,14 @@ namespace Logs.ViewModels
             }
             else
             {
-                TbProgressText = progressTextFileNotExist;
-                LogText += LogTextError + progressTextFileNotExist;
+                // Check if internet connection is available
+                // Yes: Inform user that there are no logs to upload
+                // No: Inform Customer that there is no internet connection
+                if (IsInternetConnectionAvailable)
+                {
+                    TbProgressText = progressTextFileNotExist;
+                    LogText += LogTextError + progressTextFileNotExist;
+                }
                 UpdateFTPButtons();
             }
         }
@@ -847,6 +872,10 @@ namespace Logs.ViewModels
         private void ExecuteSelectCustomFileCommand()
         {
             LogFunction.SelectCustomFile();
+
+            LogFunction.CheckInternetConnection();
+
+            UpdateFTPButtons();
         }
 
         /// <summary>
@@ -864,13 +893,21 @@ namespace Logs.ViewModels
             {
                 UpdatePropertiesUploadLogs(progressTextUploadCustomFile);
 
+                IsUploadingCustomFile = true;
+
                 Thread t = new Thread(new ThreadStart(StartUploadingCustomFilesFTP));
                 t.Start();
             }
             else
             {
-                TbProgressText = progressTextFileNotExist;
-                LogText += LogTextError + progressTextFileNotExist;
+                // Check if internet connection is available
+                // Yes: Inform user that there are no logs to upload
+                // No: Inform Customer that there is no internet connection
+                if (IsInternetConnectionAvailable)
+                {
+                    TbProgressText = progressTextFileNotExist;
+                    LogText += LogTextError + progressTextFileNotExist;
+                }
                 UpdateFTPButtons();
             }
         }
@@ -998,6 +1035,7 @@ namespace Logs.ViewModels
             IsBtnServerLogsEnabled = true;
             IsBtnClientLogsConfEnabled = true;
             IsBtnSelectCustomFileEnabled = true;
+            IsBtnUploadCustomFileEnabled = true;
         }
 
         private void UpdatePropertiesUploadLogs(string progressText)

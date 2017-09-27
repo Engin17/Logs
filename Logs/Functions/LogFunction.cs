@@ -241,6 +241,7 @@ namespace Logs.Functions
                 MainViewModel.ProgressbarVisibility = Visibility.Hidden;
                 MainViewModel.TbProgressText = ex.Message;
                 MainViewModel.UpdateFTPButtons();
+                MainViewModel.IsUploadingCustomFile = false;
             }
             finally
             {
@@ -292,7 +293,7 @@ namespace Logs.Functions
                 MainViewModel.TbSelectedCustomFileName = " " + Path.GetFileName(MainViewModel.SelectedCustomFilePath);
                 MainViewModel.CustomZipFile = MainViewModel.SelectedCustomFilePath;
                 MainViewModel.IsBtnUploadCustomFileEnabled = true;
-                MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextCustomZipFileSelected + "\n" + MainViewModel.SelectedCustomFilePath;
+                MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextCustomZipFileSelected + "\n " + MainViewModel.SelectedCustomFilePath;
                 MainViewModel.TbProgressText = MainViewModel.LogTextCustomZipFileSelected;
             }
             
@@ -344,7 +345,7 @@ namespace Logs.Functions
         /// </summary>
         private static void StartCleaning(string file)
         {
-            if (file == MainViewModel.ServerLogsTempZip)
+            if (file == MainViewModel.ServerLogsTempZip && !MainViewModel.IsUploadingCustomFile)
             {
                 if (MainViewModel.IsUploadSucceeded)
                 {
@@ -354,7 +355,7 @@ namespace Logs.Functions
                 }             
             }
 
-            else if (file == MainViewModel.ClientLogsConfTempZip)
+            else if (file == MainViewModel.ClientLogsConfTempZip && !MainViewModel.IsUploadingCustomFile)
             {
                 if (MainViewModel.IsUploadSucceeded)
                 {
@@ -364,7 +365,7 @@ namespace Logs.Functions
                 }
             }
 
-            else if (file == MainViewModel.LogsZipFolderPathZip)
+            else if (file == MainViewModel.LogsZipFolderPathZip && !MainViewModel.IsUploadingCustomFile)
             {
                 if (MainViewModel.IsUploadSucceeded)
                 {
@@ -376,7 +377,7 @@ namespace Logs.Functions
                 }
                 
             }
-            else if (file == MainViewModel.CustomZipFile)
+            else if (file == MainViewModel.CustomZipFile && MainViewModel.IsUploadingCustomFile)
             {
                 if (MainViewModel.IsUploadSucceeded)
                 {
@@ -386,6 +387,7 @@ namespace Logs.Functions
                 }           
             }
             MainViewModel.IsUploadSucceeded = true;
+            MainViewModel.IsUploadingCustomFile = false;
         }
 
         /// <summary>
