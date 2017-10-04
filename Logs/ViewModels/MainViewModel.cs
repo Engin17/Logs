@@ -7,7 +7,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Threading;
-using Microsoft.Win32;
+using System.Linq;
 
 
 namespace Logs.ViewModels
@@ -81,8 +81,8 @@ namespace Logs.ViewModels
         private static readonly string _logTextCouldNotCreate = " Could not create ";
         private static readonly string _logTextZipFolder = " zip file";
         private static readonly string _logTextUploadFailed = "File upload Failed.\r\n Error Message: ";
-        private static readonly string _logTextUploadSucceeded = " file successfully uploaded to the SeeTec FTP server. \n Please inform support staff that the logs are uploaded to the FTP server";
-        private static readonly string _logTextUploadSuccess = " file successfully uploaded to the SeeTec FTP server.";
+        private static readonly string _logTextUploadSucceeded = " successfully uploaded to the SeeTec FTP server. \n Please inform support staff that the logs are uploaded to the FTP server";
+        private static readonly string _logTextUploadSuccess = " successfully uploaded to the SeeTec FTP server.";
         private static readonly string _logTextNoInternet = "No internet connection available. FTP upload disabled.";
         private static readonly string _logTextFolderSize = "The log folder size is about ";
         private static readonly string _logTextFolderBePatientMB = " MB. \n Creating log zip file may take some time. Please be patient.";
@@ -1093,30 +1093,71 @@ namespace Logs.ViewModels
 
         /// <summary>
         /// Method to find the SeeTec installation path
-        /// Search for the path in the registry --> CurrentUser --> RecentApps
+        /// First check if Cayuga is installed in the default path
+        /// If not installes in the default path then search for SeeTec folder
         /// </summary>
         private static void FindSeeTecInstallPath()
         {
-            string registry_key = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Search\RecentApps";
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(registry_key))
-            {
-                foreach (string subkey_name in key.GetSubKeyNames())
-                {
-                    using (RegistryKey subkey = key.OpenSubKey(subkey_name))
-                    {
-                        foreach (string valueName in subkey.GetValueNames())
-                        {
-                            string application = "VMS_Client";
-                            string appPath = "AppPath";
+            string defaultSeeTecInstallPath = @"C:\Program Files\SeeTec";
 
-                            if (subkey.GetValue(valueName).ToString().Contains(application) && valueName == appPath)
+            try
+            {
+                // Check if Cayuga is installed in the default path
+                // Yes: Set installation path as default
+                // No: Search drives for SeeTec folder
+                if (Directory.Exists(defaultSeeTecInstallPath))
+                {
+                    SeeTecInstallPath = defaultSeeTecInstallPath;
+                }
+                else
+                {
+                    string[] dirsLevelOne;
+                    string[] dirsLevelOne2;
+                    string[] dirsLevelTwo;
+
+                    // Check for available hard drives and iterate one by one over all hard drives 
+                    foreach (DriveInfo d in DriveInfo.GetDrives().Where(x => x.IsReady))
+                    {
+                        try
+                        {
+                            // First search in the top directory for SeeTec folder
+                            dirsLevelOne = Directory.GetDirectories(d.RootDirectory.FullName);
+
+                            foreach (var item in dirsLevelOne)
                             {
-                                // Set the SeeTec installation path
-                                SeeTecInstallPath = Directory.GetParent(Directory.GetParent(subkey.GetValue(valueName).ToString()).ToString()).ToString();
+                                // Check if SeeTec folder is found in the top directory
+                                dirsLevelOne2 = Directory.GetDirectories(d.RootDirectory.FullName, "SeeTec");
+
+                                // If SeeTec folder is found in the top directory then set the installation path
+                                if (dirsLevelOne2.Length == 1)
+                                {
+                                    SeeTecInstallPath = dirsLevelOne2[0];
+                                    break;
+                                }
+                                else
+                                {
+                                    // If SeeTec folder is not in the top directory then search for teh folder in the subdirectory for it
+                                    dirsLevelTwo = Directory.GetDirectories(item, "SeeTec");
+
+                                    // If SeeTec folder is found in the subdirectory then set the installation path
+                                    if (dirsLevelTwo.Length == 1)
+                                    {
+                                        SeeTecInstallPath = dirsLevelTwo[0];
+                                        break;
+                                    }
+                                }
                             }
+                        }
+                        catch
+                        {
+
                         }
                     }
                 }
+            }
+            catch
+            {
+
             }
             // Set all needed paths after finding the installation path
             SetAllPaths();

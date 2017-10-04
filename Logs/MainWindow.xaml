@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:Logs.ViewModels"
         xmlns:local="clr-namespace:Logs"
         mc:Ignorable="d"
-        Title="Logs" Background="#4d535e" WindowStartupLocation="CenterScreen"  ResizeMode="NoResize" SizeToContent="WidthAndHeight" Icon="Resources\logs.ico">
+        Title="Logs" Background="#4d535e" WindowStartupLocation="CenterScreen"  ResizeMode="CanMinimize" SizeToContent="WidthAndHeight" Icon="Resources\Logs.ico">
 
     <Window.DataContext>
         <vm:MainViewModel />
@@ -82,7 +82,7 @@
         <ProgressBar  IsIndeterminate="{Binding IsProgressBarIndeterminate}" Minimum="0" Height="15"   Maximum="{Binding ProgressBarMaximum}" Value="{Binding ProgressBarValue}" Visibility="{Binding ProgressbarVisibility}" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3"/>
         <TextBox Foreground="#d2d1d3" TextAlignment="Center" Background="#4d535e" BorderThickness="0" Text="{Binding TbProgressText}" Visibility="{Binding TbProgressTextVisibility}" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="5" />
 
-        <TextBox Background="White" Grid.Row="6" Grid.ColumnSpan="7" Text="{Binding LogText}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderThickness="2" FontSize="13" Margin="0,5,0,0"/>
+        <TextBox Background="White" Grid.Row="6" Grid.ColumnSpan="7" Text="{Binding LogText}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderThickness="2" FontSize="13" Margin="0,5,0,0" />
 
     </Grid>
 </Window>
