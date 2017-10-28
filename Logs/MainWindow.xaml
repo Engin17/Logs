@@ -4,7 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Logs.ViewModels"
-        xmlns:local="clr-namespace:Logs"
+        xmlns:dragDrop="urn:gong-wpf-dragdrop"
+xmlns:local="clr-namespace:Logs"
         mc:Ignorable="d"
         Title="Logs" Background="#4d535e" WindowStartupLocation="CenterScreen"  ResizeMode="CanMinimize" SizeToContent="WidthAndHeight" Icon="Resources\Logs.ico">
 
@@ -76,13 +77,14 @@
         </StackPanel>
 
         <Button Content="Select custom zip file" Height="40" Width="150" Grid.Row="3" Grid.Column="1" Command="{Binding SelectCustomFileCommand}" IsEnabled="{Binding IsBtnSelectCustomFileEnabled}"/>
-        <TextBox VerticalContentAlignment="Center" IsEnabled="False" Height="40" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding TbSelectedCustomFileName}"/>
+        <Border dragDrop:DragDrop.IsDropTarget="True" dragDrop:DragDrop.DropHandler="{Binding}" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2">
+            <TextBox VerticalContentAlignment="Center" IsEnabled="False" Height="40" Text="{Binding TbSelectedCustomFileName}" />
+        </Border>
         <Button Content="Upload custom zip file" Height="40" Width="150" Grid.Row="3" Grid.Column="5" Command="{Binding UploadCustomFileCommand}" IsEnabled="{Binding IsBtnUploadCustomFileEnabled}"/>
 
         <ProgressBar  IsIndeterminate="{Binding IsProgressBarIndeterminate}" Minimum="0" Height="15"   Maximum="{Binding ProgressBarMaximum}" Value="{Binding ProgressBarValue}" Visibility="{Binding ProgressbarVisibility}" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3"/>
         <TextBox Foreground="#d2d1d3" TextAlignment="Center" Background="#4d535e" BorderThickness="0" Text="{Binding TbProgressText}" Visibility="{Binding TbProgressTextVisibility}" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="5" />
 
         <TextBox Background="White" Grid.Row="6" Grid.ColumnSpan="7" Text="{Binding LogText}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderThickness="2" FontSize="13" Margin="0,5,0,0" />
-
     </Grid>
 </Window>

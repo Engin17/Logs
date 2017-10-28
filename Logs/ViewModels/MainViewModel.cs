@@ -8,14 +8,15 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Threading;
 using System.Linq;
-
+using GongSolutions.Wpf.DragDrop;
+using System.Windows.Controls;
 
 namespace Logs.ViewModels
 {
     /// <summary>
     /// This is our MainViewModel that is tied to the MainWindow.
     /// </summary>
-    public class MainViewModel
+    public class MainViewModel : IDropTarget
     {
         #region Member variables
         private static string _seeTecInstallPath = "";
@@ -1209,5 +1210,45 @@ namespace Logs.ViewModels
             }
 
         }
+
+        #region IDropTarget members
+
+        /// <summary>
+        /// Method for textbox custom file drag over
+        /// Only zip or rar files can be dragged over
+        /// </summary>
+        public void DragOver(IDropInfo dropInfo)
+        {
+            var dragFileList = ((DataObject)dropInfo.Data).GetFileDropList().Cast<string>();
+            dropInfo.Effects = dragFileList.Any(item =>
+            {
+                var extension = Path.GetExtension(item);
+                return extension != null && extension.Equals(".zip") || extension.Equals(".rar");
+            }) ? DragDropEffects.Copy : DragDropEffects.None;
+        }
+
+        /// <summary>
+        /// Method for the textbox custom file drop
+        /// Only zip or rar files can be dropped
+        /// </summary>
+        public void Drop(IDropInfo dropInfo)
+        {
+            var dragFileList = ((DataObject)dropInfo.Data).GetFileDropList().Cast<string>();
+            dropInfo.Effects = dragFileList.Any(item =>
+            {
+                var extension = Path.GetExtension(item);
+
+                // Update custom file textbox UI
+                SelectedCustomFilePath = item;
+                TbSelectedCustomFileName = " " + Path.GetFileName(item);
+                CustomZipFile = SelectedCustomFilePath;
+                IsBtnUploadCustomFileEnabled = true;
+                LogText += LogTextInfo + LogTextCustomZipFileSelected + "\n " + SelectedCustomFilePath;
+                TbProgressText = LogTextCustomZipFileSelected;
+
+                return extension != null && extension.Equals(".zip") || extension.Equals(".rar");
+            }) ? DragDropEffects.Copy : DragDropEffects.None;
+        }
+        #endregion
     }
 }
