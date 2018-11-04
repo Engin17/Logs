@@ -74,9 +74,9 @@ namespace Logs.ViewModels
         private static bool _isInternetConnectionAvailable = true;
 
         private static string _logText = "Collect and upload logs!!!";
-        private static readonly string _logTextError = "\n\n [" + DateTime.Now + "] ERROR: ";
-        private static readonly string _logTextInfo = "\n\n [" + DateTime.Now + "] INFO: ";
-        private static readonly string _logTextWarning = "\n\n [" + DateTime.Now + "] WARNING: ";
+        private static readonly string _logTextError = "ERROR: ";
+        private static readonly string _logTextInfo = "INFO: ";
+        private static readonly string _logTextWarning = "WARNING: ";
         private static readonly string _logTextZipSuccess = " log folder successfully zipped \n ";
         private static readonly string _logTextZipLocation = " log folder is under: \n ";
         private static readonly string _logTextCouldNotCreate = " Could not create ";
@@ -789,7 +789,7 @@ namespace Logs.ViewModels
                 if (IsInternetConnectionAvailable)
                 {
                     TbProgressText = progressTextFileNotExist;
-                    LogText += LogTextError + progressTextFileNotExist;
+                    LogText += LogFunction.GetCurrentDateTime() + LogTextError + progressTextFileNotExist;
                 }
                 UpdateFTPButtons();
             }
@@ -820,7 +820,7 @@ namespace Logs.ViewModels
                 if (IsInternetConnectionAvailable)
                 {
                     TbProgressText = progressTextFileNotExist;
-                    LogText += LogTextError + progressTextFileNotExist;
+                    LogText += LogFunction.GetCurrentDateTime() + LogTextError + progressTextFileNotExist;
                 }
                 UpdateFTPButtons();
             }
@@ -851,7 +851,7 @@ namespace Logs.ViewModels
                 if (IsInternetConnectionAvailable)
                 {
                     TbProgressText = progressTextFileNotExist;
-                    LogText += LogTextError + progressTextFileNotExist;
+                    LogText += LogFunction.GetCurrentDateTime() + LogTextError + progressTextFileNotExist;
                 }
                 UpdateFTPButtons();
             }
@@ -907,7 +907,7 @@ namespace Logs.ViewModels
                 if (IsInternetConnectionAvailable)
                 {
                     TbProgressText = progressTextFileNotExist;
-                    LogText += LogTextError + progressTextFileNotExist;
+                    LogText += LogFunction.GetCurrentDateTime() + LogTextError + progressTextFileNotExist;
                 }
                 UpdateFTPButtons();
             }
@@ -1228,8 +1228,8 @@ namespace Logs.ViewModels
         }
 
         /// <summary>
-        /// Method for the textbox custom file drop
-        /// Only zip or rar files can be dropped
+        /// Method for textbox custom file drop
+        /// Only zip or rar files can be dragged over
         /// </summary>
         public void Drop(IDropInfo dropInfo)
         {
@@ -1243,7 +1243,7 @@ namespace Logs.ViewModels
                 TbSelectedCustomFileName = " " + Path.GetFileName(item);
                 CustomZipFile = SelectedCustomFilePath;
                 IsBtnUploadCustomFileEnabled = true;
-                LogText += LogTextInfo + LogTextCustomZipFileSelected + "\n " + SelectedCustomFilePath;
+                LogText += LogFunction.GetCurrentDateTime() + LogTextInfo + LogTextCustomZipFileSelected + "\n " + SelectedCustomFilePath;
                 TbProgressText = LogTextCustomZipFileSelected;
 
                 return extension != null && extension.Equals(".zip") || extension.Equals(".rar");

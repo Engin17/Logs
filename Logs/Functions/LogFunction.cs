@@ -65,11 +65,11 @@ namespace Logs.Functions
             }
             catch (DirectoryNotFoundException ex)
             {
-                MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
+                MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextError + ex.Message;
             }
             catch (IOException ex)
             {
-                MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
+                MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextError + ex.Message;
             }
         }
 
@@ -106,9 +106,8 @@ namespace Logs.Functions
                     // Check if currently client logs are zipped and if the zip process succeeded
                     if (logName == MainViewModel.ClientLogsConfName && File.Exists(MainViewModel.ClientLogsConfTempZip))
                     {
-                        MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextZipSuccess;
-                        MainViewModel.LogText += MainViewModel.ClientLogsConfTempZip;
-
+                        MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextZipSuccess + MainViewModel.ClientLogsConfTempZip; 
+  
                         try
                         {
                             if (Directory.Exists(MainViewModel.ClientLogsConfTemp))
@@ -131,8 +130,7 @@ namespace Logs.Functions
                     // Check if currently server logs are zipped and if the zip process succeeded
                     else if (File.Exists(MainViewModel.ServerLogsTempZip) && logName == MainViewModel.ServerLogsName)
                     {
-                        MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextZipSuccess;
-                        MainViewModel.LogText += MainViewModel.ServerLogsTempZip;
+                        MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextZipSuccess + MainViewModel.ServerLogsTempZip;
 
                         MainViewModel.UpdatePropertiesCreateLogsAtEnd(MainViewModel.ServerLogsName);
                     }
@@ -146,7 +144,7 @@ namespace Logs.Functions
                     }
                     catch (FileNotFoundException ex)
                     {
-                        MainViewModel.LogText += MainViewModel.LogTextInfo + ex.Message;
+                        MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextInfo + ex.Message;
                     }
                     catch (UnauthorizedAccessException)
                     {
@@ -159,8 +157,8 @@ namespace Logs.Functions
             }
             catch (DirectoryNotFoundException ex)
             {
-                MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
-                MainViewModel.LogText += MainViewModel.LogTextError + MainViewModel.LogTextCouldNotCreate + MainViewModel.ClientLogsConfName.ToLower() + MainViewModel.LogTextZipFolder;
+                MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextError + ex.Message;
+                MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextError + MainViewModel.LogTextCouldNotCreate + MainViewModel.ClientLogsConfName.ToLower() + MainViewModel.LogTextZipFolder;
             }
             catch (IOException ex)
             {
@@ -202,18 +200,18 @@ namespace Logs.Functions
                 string file = logPath;
                 string uploadFileName = new FileInfo(file).Name;
 
-                // If the file is 
+                // If the filename is not empty
                 if (logName != "")
                 {
                     uploadFileName = logName + "_" + uploadFileName;
                 }
   
-                string uploadUrl = "ftp://217.22.207.192/";
+                string uploadUrl = "ftp://customer-logfiles.seetec-video.com/";
                 fs = new FileStream(file, FileMode.Open, FileAccess.Read);
                 string ftpUrl = string.Format("{0}/{1}", uploadUrl, uploadFileName);
                 FtpWebRequest requestObj = FtpWebRequest.Create(ftpUrl) as FtpWebRequest;
                 requestObj.Method = WebRequestMethods.Ftp.UploadFile;
-                requestObj.Credentials = new NetworkCredential("anonymous", "");
+                requestObj.Credentials = new NetworkCredential("customerlog", "823lkjw$GF6a");
                 rs = requestObj.GetRequestStream();
 
                 byte[] buffer = new byte[8192];
@@ -236,7 +234,7 @@ namespace Logs.Functions
             }
             catch (Exception ex)
             {
-                MainViewModel.LogText += MainViewModel.LogTextError + MainViewModel.LogTextUploadFailed + ex.Message;
+                MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextError + MainViewModel.LogTextUploadFailed + ex.Message;
                 MainViewModel.IsUploadSucceeded = false;
                 MainViewModel.ProgressbarVisibility = Visibility.Hidden;
                 MainViewModel.TbProgressText = ex.Message;
@@ -276,7 +274,7 @@ namespace Logs.Functions
             }
             catch (Win32Exception ex)
             {
-                MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
+                MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextError + ex.Message;
             }
         }
 
@@ -293,7 +291,7 @@ namespace Logs.Functions
                 MainViewModel.TbSelectedCustomFileName = " " + Path.GetFileName(MainViewModel.SelectedCustomFilePath);
                 MainViewModel.CustomZipFile = MainViewModel.SelectedCustomFilePath;
                 MainViewModel.IsBtnUploadCustomFileEnabled = true;
-                MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextCustomZipFileSelected + "\n " + MainViewModel.SelectedCustomFilePath;
+                MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextInfo + MainViewModel.LogTextCustomZipFileSelected + "\n " + MainViewModel.SelectedCustomFilePath;
                 MainViewModel.TbProgressText = MainViewModel.LogTextCustomZipFileSelected;
             }
             
@@ -310,7 +308,7 @@ namespace Logs.Functions
             }
             catch (Exception ex)
             {
-                MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
+                MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextError + ex.Message;
             }
         }
 
@@ -334,7 +332,7 @@ namespace Logs.Functions
             // Catch exception if the file was already copied.
             catch (IOException ex)
             {
-                MainViewModel.LogText += MainViewModel.LogTextError + ex.Message;
+                MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextError + ex.Message;
             }
         }
 
@@ -349,7 +347,7 @@ namespace Logs.Functions
             {
                 if (MainViewModel.IsUploadSucceeded)
                 {
-                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextZipFolder + MainViewModel.LogTextUploadSucceeded;
+                    MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextZipFolder + MainViewModel.LogTextUploadSucceeded;
                     DeleteFilesFoldersAfterUpload(MainViewModel.ServerLogsTempZip, MainViewModel.ServerLogsCopyTemp);
                     MainViewModel.UpdatePropertiesFTPUpload(MainViewModel.ServerLogsName);
                 }             
@@ -359,7 +357,7 @@ namespace Logs.Functions
             {
                 if (MainViewModel.IsUploadSucceeded)
                 {
-                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextZipFolder + MainViewModel.LogTextUploadSucceeded;
+                    MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextZipFolder + MainViewModel.LogTextUploadSucceeded;
                     DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
                     MainViewModel.UpdatePropertiesFTPUpload(MainViewModel.ClientLogsConfName);
                 }
@@ -369,7 +367,7 @@ namespace Logs.Functions
             {
                 if (MainViewModel.IsUploadSucceeded)
                 {
-                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogZipFolderName + MainViewModel.LogTextZipFolder + MainViewModel.LogTextUploadSucceeded;
+                    MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextInfo + MainViewModel.LogZipFolderName + MainViewModel.LogTextZipFolder + MainViewModel.LogTextUploadSucceeded;
                     DeleteFilesFoldersAfterUpload(MainViewModel.ServerLogsTempZip, MainViewModel.ServerLogsCopyTemp);
                     DeleteFilesFoldersAfterUpload(MainViewModel.ClientLogsConfTempZip, MainViewModel.ClientLogsConfTemp);
                     DeleteFilesFoldersAfterUpload(MainViewModel.LogsZipFolderPathZip, MainViewModel.LogsTemp);
@@ -381,7 +379,7 @@ namespace Logs.Functions
             {
                 if (MainViewModel.IsUploadSucceeded)
                 {
-                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextCustomFile + MainViewModel.LogTextUploadSucceeded;
+                    MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextInfo + MainViewModel.LogTextCustomFile + MainViewModel.LogTextUploadSucceeded;
                     DeleteCustomZipFileAfterUpload(MainViewModel.CustomZipFile);
                     MainViewModel.UpdatePropertiesFTPUpload(MainViewModel.LogTextCustomFile);
                 }           
@@ -454,7 +452,7 @@ namespace Logs.Functions
                 if (MainViewModel.IsInternetConnectionAvailable)
                 {
                     MainViewModel.IsInternetConnectionAvailable = false;
-                    MainViewModel.LogText += MainViewModel.LogTextWarning + MainViewModel.LogTextNoInternet;
+                    MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextWarning + MainViewModel.LogTextNoInternet;
                     MainViewModel.TbProgressText = MainViewModel.LogTextNoInternet;
 
                     // No internet connection. Disable FTP buttons
@@ -478,11 +476,11 @@ namespace Logs.Functions
                 {
                     size = Math.Round(size / 1024d, 2);
 
-                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextFolderSize + size + MainViewModel.LogTextFolderBePatientGB;
+                    MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextInfo + MainViewModel.LogTextFolderSize + size + MainViewModel.LogTextFolderBePatientGB;
                 }
                 else if (size > 300d)
                 {
-                    MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextFolderSize + size + MainViewModel.LogTextFolderBePatientMB;
+                    MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextInfo + MainViewModel.LogTextFolderSize + size + MainViewModel.LogTextFolderBePatientMB;
                 }
             }
             catch (DirectoryNotFoundException ex)
@@ -498,7 +496,7 @@ namespace Logs.Functions
         {
             long length = new FileInfo(zipPath).Length;
             double size = Math.Round((length / 1024d) / 1024d, 2);
-            MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.LogTextZipSize + size + MainViewModel.LogTextZipBePatientMB;
+            MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextInfo + MainViewModel.LogTextZipSize + size + MainViewModel.LogTextZipBePatientMB;
         }
 
         /// <summary>
@@ -508,13 +506,24 @@ namespace Logs.Functions
         {
             if (!MainViewModel.IsBtnClientLogsConfEnabled)
             {
-                MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextLogsNotAvailabe;
+                MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextInfo + MainViewModel.ClientLogsConfName + MainViewModel.LogTextLogsNotAvailabe;
             }
 
             if (!MainViewModel.IsBtnServerLogsEnabled)
             {
-                MainViewModel.LogText += MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextLogsNotAvailabe;
+                MainViewModel.LogText += LogFunction.GetCurrentDateTime() + MainViewModel.LogTextInfo + MainViewModel.ServerLogsName + MainViewModel.LogTextLogsNotAvailabe;
             }
+        }
+
+        /// <summary>
+        /// Get the current time for the log entry
+        /// </summary>
+        public static string GetCurrentDateTime()
+        {
+            DateTime current = new DateTime();
+            current = DateTime.Now;
+
+            return "\n\n [" + current + "] ";
         }
     }
 
