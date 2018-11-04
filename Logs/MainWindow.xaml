@@ -86,5 +86,7 @@ xmlns:local="clr-namespace:Logs"
         <TextBox Foreground="#d2d1d3" TextAlignment="Center" Background="#4d535e" BorderThickness="0" Text="{Binding TbProgressText}" Visibility="{Binding TbProgressTextVisibility}" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="5" />
 
         <TextBox Background="White" Grid.Row="6" Grid.ColumnSpan="7" Text="{Binding LogText}" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" BorderThickness="2" FontSize="13" Margin="0,5,0,0" />
+
+        <TextBlock Text="{Binding AssemblyVersion}" Grid.Row="7" Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="WhiteSmoke"/>
     </Grid>
 </Window>

@@ -10,6 +10,7 @@ using System.Threading;
 using System.Linq;
 using GongSolutions.Wpf.DragDrop;
 using System.Windows.Controls;
+using System.Reflection;
 
 namespace Logs.ViewModels
 {
@@ -19,6 +20,8 @@ namespace Logs.ViewModels
     public class MainViewModel : IDropTarget
     {
         #region Member variables
+        private static string _assemblyVersion = string.Empty;
+
         private static string _seeTecInstallPath = "";
 
         private static string _serverLogsPath = "";
@@ -156,6 +159,16 @@ namespace Logs.ViewModels
             set
             {
                 _isServerlogsCreated = value;
+            }
+        }
+
+        public static string AssemblyVersion
+        {
+            get { return _assemblyVersion; }
+            set
+            {
+                _assemblyVersion = value;
+                RaiseStaticPropertyChanged();
             }
         }
 
@@ -733,6 +746,9 @@ namespace Logs.ViewModels
 
             // Subscribe to an event which is fired when the event indicates that the associated process exited
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
+
+            // Get the current Assembly version to display it on the main window
+            AssemblyVersion = "" + GetRunningVersion();
         }
 
         /// <summary>
@@ -1170,6 +1186,24 @@ namespace Logs.ViewModels
         private static void SetAllPaths()
         {
             ServerLogsPath = SeeTecInstallPath + @"\log";
+        }
+
+        /// <summary>
+        /// Method to get the current Assembly information
+        /// </summary>
+        private string GetRunningVersion()
+        {
+            try
+            {
+                String s = "v" + Assembly.GetExecutingAssembly().GetName().Version;
+                return s.Substring(0, 6);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return "xxx";
+            }
+
         }
 
         /// <summary>
