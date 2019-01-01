@@ -284,7 +284,7 @@ namespace Logs.Functions
         public static void SelectCustomFile()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Zip files|*.zip;*.rar";
+            openFileDialog.Filter = "Zip files|*.zip;*.7z";
             if (openFileDialog.ShowDialog() == true)
             {
                 MainViewModel.SelectedCustomFilePath = openFileDialog.FileName;

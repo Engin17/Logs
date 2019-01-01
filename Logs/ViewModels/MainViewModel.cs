@@ -1257,7 +1257,7 @@ namespace Logs.ViewModels
             dropInfo.Effects = dragFileList.Any(item =>
             {
                 var extension = Path.GetExtension(item);
-                return extension != null && extension.Equals(".zip") || extension.Equals(".rar");
+                return extension != null && extension.Equals(".zip") || extension.Equals(".7z");
             }) ? DragDropEffects.Copy : DragDropEffects.None;
         }
 
